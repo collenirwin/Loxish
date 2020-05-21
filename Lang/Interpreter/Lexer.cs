@@ -189,12 +189,12 @@ namespace Lang.Interpreter
             if (AtEndOfSource)
             {
                 ErrorState.AddError(_line, "Unterminated string.");
+                return;
             }
-
-            AddToken(TokenType.String, _source.Slice(_start + 1, _current));
 
             // consume the ending "
             NextChar();
+            AddToken(TokenType.String, _source.Slice(_start + 1, _current - 1));
         }
 
         private void AddNumberToken()

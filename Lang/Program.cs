@@ -45,19 +45,21 @@ namespace Lang
 
         static int Run(string source)
         {
-            var lexer = new Lexer(source);
+            var lexer = new Lexer(source, new ErrorState());
+            var tokens = lexer.Tokenize();
 
-            try
+            foreach (var token in tokens)
             {
-                var tokens = lexer.Tokenize();
-                foreach (var token in tokens)
-                {
-                    Console.WriteLine(token);
-                }
+                Console.WriteLine(token);
             }
-            catch (SyntaxError ex)
+
+            if (lexer.ErrorState.HasErrors)
             {
-                WriteError(ex.Line, "", ex.Message);
+                foreach (var error in lexer.ErrorState.Errors)
+                {
+                    WriteError(error.Line, "", error.Message);
+                }
+
                 return 2;
             }
 
