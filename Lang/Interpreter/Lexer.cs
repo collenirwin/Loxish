@@ -1,6 +1,7 @@
 ﻿using Lang.Utils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Text;
 
@@ -135,6 +136,10 @@ namespace Lang.Interpreter
                     {
                         AddNumberToken();
                     }
+                    else if (char.IsLetter(c) || c == '_')
+                    {
+                        AddIndentifierToken();
+                    }
                     else
                     {
                         ErrorState.AddError(_line, $"Unexpected token: '{c}'.");
@@ -216,6 +221,17 @@ namespace Lang.Interpreter
             }
 
             AddToken(TokenType.Number, double.Parse(_source.Slice(_start, _current)));
+        }
+
+        private void AddIndentifierToken()
+        {
+            char next;
+            while (char.IsLetterOrDigit(next = Peek()) || next == '_')
+            {
+                NextChar();
+            }
+
+            AddToken(TokenType.Identifier);
         }
     }
 }
