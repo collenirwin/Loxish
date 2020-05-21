@@ -24,6 +24,25 @@ namespace Lang.Interpreter
         private int _current = 0;
         private int _line = 1;
 
+        private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
+        {
+            { "class",  TokenType.Class },
+            { "and",    TokenType.And },
+            { "or",     TokenType.Or },
+            { "if",     TokenType.If },
+            { "else",   TokenType.Else },
+            { "true",   TokenType.True },
+            { "false",  TokenType.False },
+            { "this",   TokenType.This },
+            { "super",  TokenType.Super },
+            { "var",    TokenType.Var },
+            { "return", TokenType.Return },
+            { "for",    TokenType.For },
+            { "while",  TokenType.While },
+            { "print",  TokenType.Print },
+            { "null",   TokenType.Null }
+        };
+
         private bool AtEndOfSource => _current >= _source.Length;
 
         /// <summary>
@@ -231,7 +250,8 @@ namespace Lang.Interpreter
                 NextChar();
             }
 
-            AddToken(TokenType.Identifier);
+            string text = _source.Slice(_start, _current);
+            AddToken(_keywords.ContainsKey(text) ? _keywords[text] : TokenType.Identifier);
         }
     }
 }

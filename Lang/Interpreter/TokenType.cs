@@ -46,6 +46,7 @@
         For,
         While,
         Print,
+        Null,
 
         EndOfFile
     }
