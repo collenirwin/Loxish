@@ -32,7 +32,7 @@
                 if (Token != null)
                 {
                     tokenMessage = Token.Type == TokenType.EndOfFile
-                        ? " at end"
+                        ? " at end of source"
                         : $" at '{Token.WrappedSource}'";
                 }
 
@@ -63,6 +63,7 @@
         public SyntaxError(Token token, string message) : this(message)
         {
             Line = token.Line;
+            Token = token;
         }
     }
 }
