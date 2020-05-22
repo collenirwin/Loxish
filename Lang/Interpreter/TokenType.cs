@@ -42,6 +42,7 @@
         This,
         Super,
         Var,
+        Fun,
         Return,
         For,
         While,

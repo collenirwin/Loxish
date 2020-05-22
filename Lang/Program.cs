@@ -57,18 +57,13 @@ namespace Lang
             {
                 foreach (var error in lexer.ErrorState.Errors)
                 {
-                    WriteError(error.Line, "", error.Message);
+                    Console.WriteLine(error.FullMessage);
                 }
 
                 return 2;
             }
 
             return 0;
-        }
-
-        static void WriteError(int line, string where, string message)
-        {
-            Console.WriteLine($"[Line {line}] Error: {message}");
         }
     }
 }

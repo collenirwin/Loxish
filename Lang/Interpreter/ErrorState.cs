@@ -28,6 +28,13 @@ namespace Lang.Interpreter
         /// <summary>
         /// Adds an error to the list.
         /// </summary>
+        /// <param name="token">The token involved in the error.</param>
+        /// <param name="message">Message describing the detected error.</param>
+        public void AddError(Token token, string message) => Errors.Add(new SyntaxError(token, message));
+
+        /// <summary>
+        /// Adds an error to the list.
+        /// </summary>
         /// <param name="error">Error to add.</param>
         public void AddError(SyntaxError error) => Errors.Add(error);
     }

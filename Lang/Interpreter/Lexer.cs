@@ -39,7 +39,7 @@ namespace Lang.Interpreter
             { "null",   TokenType.Null }
         };
 
-        private bool AtEndOfSource => _current >= _source.Length;
+        private bool _atEndOfSource => _current >= _source.Length;
 
         /// <summary>
         /// Initializes a <see cref="Lexer"/> with source code and an <see cref="ErrorState"/> object.
@@ -54,7 +54,7 @@ namespace Lang.Interpreter
 
         public List<Token> Tokenize()
         {
-            while (!AtEndOfSource)
+            while (!_atEndOfSource)
             {
                 _start = _current;
                 ScanNextToken();
@@ -131,7 +131,7 @@ namespace Lang.Interpreter
                     if (NextCharIs('/'))
                     {
                         // consume all of the chars of this line without creating a token
-                        while (Peek() != '\n' && !AtEndOfSource)
+                        while (Peek() != '\n' && !_atEndOfSource)
                         {
                             NextChar();
                         }
@@ -168,7 +168,7 @@ namespace Lang.Interpreter
 
         private bool NextCharIs(char expected)
         {
-            if (AtEndOfSource || _source[_current] != expected)
+            if (_atEndOfSource || _source[_current] != expected)
             {
                 return false;
             }
@@ -196,7 +196,7 @@ namespace Lang.Interpreter
         private void AddStringToken()
         {
             char next;
-            while ((next = Peek()) != '"' && !AtEndOfSource)
+            while ((next = Peek()) != '"' && !_atEndOfSource)
             {
                 if (next == '\n')
                 {
@@ -206,7 +206,7 @@ namespace Lang.Interpreter
                 NextChar();
             }
 
-            if (AtEndOfSource)
+            if (_atEndOfSource)
             {
                 ErrorState.AddError(_line, "Unterminated string.");
                 return;
