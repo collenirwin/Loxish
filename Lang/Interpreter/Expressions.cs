@@ -5,6 +5,7 @@
     /// </summary>
     public abstract class ExpressionBase
     {
+        public abstract T Accept<T>(IExpressionVisitor<T> visitor);
     }
 
     /// <summary>
@@ -19,6 +20,11 @@
         {
             Operand = operand;
             Operator = @operator;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitUnaryExpression(this);
         }
     }
 
@@ -37,6 +43,11 @@
             RightOperand = right;
             Operator = @operator;
         }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitBinaryExpression(this);
+        }
     }
 
     /// <summary>
@@ -50,6 +61,11 @@
         {
             Expression = expression;
         }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitGroupingExpression(this);
+        }
     }
 
     /// <summary>
@@ -62,6 +78,11 @@
         public LiteralExpression(object value)
         {
             Value = value;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitLiteralExpression(this);
         }
     }
 }
