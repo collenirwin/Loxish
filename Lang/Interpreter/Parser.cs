@@ -10,7 +10,7 @@ namespace Lang.Interpreter
         private int _current = 0;
 
         private bool _atEndOfTokens => Peek().Type == TokenType.EndOfFile;
-        private Token CurrentToken => _tokens[_current - 1];
+        private Token _currentToken => _tokens[_current - 1];
 
         public Parser(List<Token> tokens, ErrorState errorState)
         {
@@ -43,7 +43,7 @@ namespace Lang.Interpreter
 
             while (NextTokenMatches(TokenType.DoubleEqual, TokenType.BangEqual))
             {
-                var @operator = CurrentToken;
+                var @operator = _currentToken;
                 var right = Comparison();
 
                 // wrap all expressions into the outer one
@@ -61,7 +61,7 @@ namespace Lang.Interpreter
             while (NextTokenMatches(TokenType.LessThan, TokenType.LessThanOrEqual,
                 TokenType.GreaterThan, TokenType.GreaterThanOrEqual))
             {
-                var @operator = CurrentToken;
+                var @operator = _currentToken;
                 var right = Addition();
                 expression = new BinaryExpression(expression, right, @operator);
             }
@@ -75,7 +75,7 @@ namespace Lang.Interpreter
 
             while (NextTokenMatches(TokenType.Plus, TokenType.Minus))
             {
-                var @operator = CurrentToken;
+                var @operator = _currentToken;
                 var right = Multiplication();
                 expression = new BinaryExpression(expression, right, @operator);
             }
@@ -89,7 +89,7 @@ namespace Lang.Interpreter
 
             while (NextTokenMatches(TokenType.Star, TokenType.Slash))
             {
-                var @operator = CurrentToken;
+                var @operator = _currentToken;
                 var right = Unary();
                 expression = new BinaryExpression(expression, right, @operator);
             }
@@ -101,7 +101,7 @@ namespace Lang.Interpreter
         {
             if (NextTokenMatches(TokenType.Bang, TokenType.Minus))
             {
-                var @operator = CurrentToken;
+                var @operator = _currentToken;
                 var right = Unary();
                 return new UnaryExpression(right, @operator);
             }
@@ -128,11 +128,12 @@ namespace Lang.Interpreter
 
             if (NextTokenMatches(TokenType.String, TokenType.Number))
             {
-                return new LiteralExpression(CurrentToken.Value);
+                return new LiteralExpression(_currentToken.Value);
             }
 
             if (NextTokenMatches(TokenType.LeftParen))
             {
+                NextToken();
                 var expression = Expression();
                 Consume(TokenType.RightParen, errorMessage: "Expected ')' after expression.");
                 return new GroupingExpression(expression);
@@ -149,7 +150,7 @@ namespace Lang.Interpreter
             // so that we can continue parsing after an error has been detected
             while (!_atEndOfTokens)
             {
-                if (CurrentToken.Type == TokenType.SemiColon)
+                if (_currentToken.Type == TokenType.SemiColon)
                 {
                     return;
                 }
@@ -178,7 +179,7 @@ namespace Lang.Interpreter
                 _current++;
             }
 
-            return CurrentToken;
+            return _currentToken;
         }
 
         private Token Peek() => _tokens[_current];
