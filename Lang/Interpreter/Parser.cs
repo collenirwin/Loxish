@@ -18,6 +18,24 @@ namespace Lang.Interpreter
             ErrorState = errorState;
         }
 
+        public ExpressionBase Parse()
+        {
+            try
+            {
+                return Expression();
+            }
+            catch (ParserException)
+            {
+                return null;
+            }
+        }
+
+        private ExpressionBase Expression()
+        {
+            // start with the lowest precedence expression type
+            return Equality();
+        }
+
         private ExpressionBase Equality()
         {
             // we're calling Comparison because it is the pattern with the next-higher precedence to equality
@@ -108,7 +126,7 @@ namespace Lang.Interpreter
                 return new LiteralExpression(null);
             }
 
-            if (NextTokenMatches(TokenType.String))
+            if (NextTokenMatches(TokenType.String, TokenType.Number))
             {
                 return new LiteralExpression(CurrentToken.Value);
             }
@@ -120,12 +138,7 @@ namespace Lang.Interpreter
                 return new GroupingExpression(expression);
             }
 
-            throw new NotImplementedException();
-        }
-
-        private ExpressionBase Expression()
-        {
-            throw new NotImplementedException();
+            throw Error(Peek(), "Expression expected.");
         }
 
         private void Synchronize()

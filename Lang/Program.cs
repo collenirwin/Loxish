@@ -45,17 +45,15 @@ namespace Lang
 
         static int Run(string source)
         {
-            var lexer = new Lexer(source, new ErrorState());
+            var errorState = new ErrorState();
+            var lexer = new Lexer(source, errorState);
             var tokens = lexer.Tokenize();
+            var parser = new Parser(tokens, errorState);
+            var expression = parser.Parse();
 
-            foreach (var token in tokens)
+            if (errorState.HasErrors)
             {
-                Console.WriteLine(token);
-            }
-
-            if (lexer.ErrorState.HasErrors)
-            {
-                foreach (var error in lexer.ErrorState.Errors)
+                foreach (var error in errorState.Errors)
                 {
                     Console.WriteLine(error.FullMessage);
                 }
@@ -63,6 +61,7 @@ namespace Lang
                 return 2;
             }
 
+            Console.WriteLine(new AstPrinter().Print(expression));
             return 0;
         }
     }
