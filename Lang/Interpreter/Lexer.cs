@@ -1,9 +1,5 @@
 ﻿using Lang.Utils;
-using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using System.Text;
 
 namespace Lang.Interpreter
 {
