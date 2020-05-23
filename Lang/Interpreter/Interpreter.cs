@@ -7,8 +7,15 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>
     {
+        /// <summary>
+        /// Has a <see cref="RuntimeException"/> been thrown?
+        /// </summary>
+        public bool RuntimeExceptionThrown { get; private set; }
+
         public void Interpret(ExpressionBase expression)
         {
+            RuntimeExceptionThrown = false;
+
             try
             {
                 var value = Evaluate(expression);
@@ -16,6 +23,7 @@ namespace Lang.Interpreter
             }
             catch (RuntimeException ex)
             {
+                RuntimeExceptionThrown = true;
                 ErrorReporter.ReportRuntimeException(ex);
             }
         }

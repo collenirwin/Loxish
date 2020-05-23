@@ -7,6 +7,8 @@ namespace Lang
 {
     class Program
     {
+        static readonly Interpreter.Interpreter _interpreter = new Interpreter.Interpreter();
+
         static int Main(string[] args)
         {
             if (args.Length > 1)
@@ -57,8 +59,8 @@ namespace Lang
                 return 2;
             }
 
-            Console.WriteLine(new AstPrinter().Print(expression));
-            return 0;
+            _interpreter.Interpret(expression);
+            return _interpreter.RuntimeExceptionThrown ? 3 : 1;
         }
     }
 }
