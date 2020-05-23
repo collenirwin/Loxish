@@ -25,6 +25,11 @@
         LessThanOrEqual,
         GreaterThan,
         GreaterThanOrEqual,
+        Amp,
+        DoubleAmp,
+        Pipe,
+        DoublePipe,
+        Caret,
 
         // literals
         Identifier,
@@ -33,8 +38,6 @@
 
         // keywords
         Class,
-        And,
-        Or,
         If,
         Else,
         True,

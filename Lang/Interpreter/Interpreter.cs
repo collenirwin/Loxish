@@ -120,6 +120,16 @@ namespace Lang.Interpreter
                 case TokenType.Slash:
                     return RunOperationAsNumbers(left, right, expression.Operator, (l, r) => l / r);
 
+                case TokenType.Amp:
+                    return RunOperationAsNumbers(left, right, expression.Operator,
+                        (l, r) => (double)((int)l & (int)r));
+                case TokenType.Pipe:
+                    return RunOperationAsNumbers(left, right, expression.Operator,
+                        (l, r) => (double)((int)l | (int)r));
+                case TokenType.Caret:
+                    return RunOperationAsNumbers(left, right, expression.Operator,
+                        (l, r) => (double)((int)l ^ (int)r));
+
                 case TokenType.DoubleEqual:
                     return AreEqual(left, right);
                 case TokenType.BangEqual:

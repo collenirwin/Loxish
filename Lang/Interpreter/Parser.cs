@@ -216,7 +216,7 @@ namespace Lang.Interpreter
 
         private ExpressionBase Assignment()
         {
-            var expression = Equality();
+            var expression = Binary();
 
             if (NextTokenMatches(TokenType.Equal))
             {
@@ -231,6 +231,20 @@ namespace Lang.Interpreter
                 }
 
                 Error(equalToken, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        private ExpressionBase Binary()
+        {
+            var expression = Equality();
+
+            while (NextTokenMatches(TokenType.Amp, TokenType.Pipe, TokenType.Caret))
+            {
+                var @operator = _currentToken;
+                var right = Equality();
+                expression = new BinaryExpression(expression, right, @operator);
             }
 
             return expression;

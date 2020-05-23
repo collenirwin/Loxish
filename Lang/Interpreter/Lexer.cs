@@ -11,8 +11,6 @@ namespace Lang.Interpreter
         private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
         {
             { "class",  TokenType.Class },
-            { "and",    TokenType.And },
-            { "or",     TokenType.Or },
             { "if",     TokenType.If },
             { "else",   TokenType.Else },
             { "true",   TokenType.True },
@@ -114,6 +112,9 @@ namespace Lang.Interpreter
                 case ';':
                     AddToken(TokenType.SemiColon);
                     break;
+                case '^':
+                    AddToken(TokenType.Caret);
+                    break;
 
                 // single or double-char tokens
                 case '!':
@@ -127,6 +128,12 @@ namespace Lang.Interpreter
                     break;
                 case '>':
                     AddToken(NextCharIs('=') ? TokenType.GreaterThanOrEqual : TokenType.GreaterThan);
+                    break;
+                case '&':
+                    AddToken(NextCharIs('&') ? TokenType.DoubleAmp : TokenType.Amp);
+                    break;
+                case '|':
+                    AddToken(NextCharIs('|') ? TokenType.DoublePipe : TokenType.Pipe);
                     break;
 
                 // longer tokens
