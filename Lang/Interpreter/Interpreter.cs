@@ -8,6 +8,8 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
+        private readonly EnvironmentState _environment = new EnvironmentState();
+
         /// <summary>
         /// Has a <see cref="RuntimeException"/> been thrown?
         /// </summary>
@@ -115,6 +117,16 @@ namespace Lang.Interpreter
                 TokenType.Bang => !IsTruthy(operand),
                 _ => throw new RuntimeException(expression.Operator, "Invalid unary expression."),
             };
+        }
+
+        /// <summary>
+        /// Evaluates a variable expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitVariableExpression(VariableExpression expression)
+        {
+            return _environment.GetValue(expression.Name);
         }
 
         /// <summary>
@@ -256,6 +268,17 @@ namespace Lang.Interpreter
         {
             var value = Evaluate(statement.Expression);
             Console.WriteLine(Stringify(value));
+        }
+
+        public void VisitVarStatement(VarStatement statement)
+        {
+            object value = null;
+            if (statement.Initializer != null)
+            {
+                value = Evaluate(statement.Initializer);
+            }
+
+            _environment.Define(statement.Name.WrappedSource, value);
         }
     }
 }

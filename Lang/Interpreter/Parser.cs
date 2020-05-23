@@ -187,7 +187,7 @@ namespace Lang.Interpreter
                 return new LiteralExpression(_currentToken.Value);
             }
 
-            if (NextTokenMatches(TokenType.Var))
+            if (NextTokenMatches(TokenType.Identifier))
             {
                 return new VariableExpression(_currentToken);
             }

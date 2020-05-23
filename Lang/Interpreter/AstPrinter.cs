@@ -37,6 +37,11 @@ namespace Lang.Interpreter
             return Parenthesize(expression.Operator.WrappedSource, expression.Operand);
         }
 
+        public string VisitVariableExpression(VariableExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         private string Parenthesize(string name, params ExpressionBase[] expressions) =>
             $"({name} {string.Join(" ", expressions.Select(expression => expression.Accept(this)))})";
     }
