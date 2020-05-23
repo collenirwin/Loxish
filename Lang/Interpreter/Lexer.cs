@@ -8,18 +8,6 @@ namespace Lang.Interpreter
     /// </summary>
     public class Lexer : IErrorRecorder
     {
-        /// <summary>
-        /// Contains any errors thrown during a <see cref="Tokenize"/> call.
-        /// </summary>
-        public ErrorState ErrorState { get; }
-
-        private readonly string _source;
-        private readonly List<Token> _tokens = new List<Token>();
-
-        private int _start = 0;
-        private int _current = 0;
-        private int _line = 1;
-
         private static readonly Dictionary<string, TokenType> _keywords = new Dictionary<string, TokenType>
         {
             { "class",  TokenType.Class },
@@ -39,7 +27,19 @@ namespace Lang.Interpreter
             { "null",   TokenType.Null }
         };
 
+        private readonly string _source;
+        private readonly List<Token> _tokens = new List<Token>();
+
+        private int _start = 0;
+        private int _current = 0;
+        private int _line = 1;
+
         private bool _atEndOfSource => _current >= _source.Length;
+
+        /// <summary>
+        /// Contains any errors thrown during a <see cref="Tokenize"/> call.
+        /// </summary>
+        public ErrorState ErrorState { get; }
 
         /// <summary>
         /// Initializes a <see cref="Lexer"/> with source code and an <see cref="ErrorState"/> object.
@@ -52,6 +52,10 @@ namespace Lang.Interpreter
             ErrorState = errorState;
         }
 
+        /// <summary>
+        /// Creates tokens from source code.
+        /// </summary>
+        /// <returns>All tokens generated from the source code.</returns>
         public List<Token> Tokenize()
         {
             while (!_atEndOfSource)

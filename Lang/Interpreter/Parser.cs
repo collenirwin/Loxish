@@ -3,21 +3,37 @@ using System.Collections.Generic;
 
 namespace Lang.Interpreter
 {
+    /// <summary>
+    /// Parses tokens into statements.
+    /// </summary>
     public class Parser : IErrorRecorder
     {
-        public ErrorState ErrorState { get; }
         private readonly List<Token> _tokens;
         private int _current = 0;
 
         private bool _atEndOfTokens => Peek().Type == TokenType.EndOfFile;
         private Token _currentToken => _tokens[_current - 1];
 
+        /// <summary>
+        /// Contains any errors thrown during a <see cref="Parse"/> call.
+        /// </summary>
+        public ErrorState ErrorState { get; }
+
+        /// <summary>
+        /// Initializes a <see cref="Parser"/> with tokens and an error state.
+        /// </summary>
+        /// <param name="tokens">Tokens to parse.</param>
+        /// <param name="errorState">Error state object to record detected errors.</param>
         public Parser(List<Token> tokens, ErrorState errorState)
         {
             _tokens = tokens;
             ErrorState = errorState;
         }
 
+        /// <summary>
+        /// Creates statements from tokens.
+        /// </summary>
+        /// <returns>All statements generated from the tokens.</returns>
         public List<StatementBase> Parse()
         {
             var statements = new List<StatementBase>();
@@ -30,6 +46,46 @@ namespace Lang.Interpreter
             return statements;
         }
 
+        /// <summary>
+        /// Gets to the next statement after an error has occured so that parsing may continue.
+        /// </summary>
+        private void Synchronize()
+        {
+            NextToken();
+
+            // look for the end of the current statement or the beginning of the next
+            // so that we can continue parsing after an error has been detected
+            while (!_atEndOfTokens)
+            {
+                if (_currentToken.Type == TokenType.SemiColon)
+                {
+                    return;
+                }
+
+                switch (Peek().Type)
+                {
+                    case TokenType.Class:
+                    case TokenType.Fun:
+                    case TokenType.Var:
+                    case TokenType.If:
+                    case TokenType.For:
+                    case TokenType.While:
+                    case TokenType.Print:
+                    case TokenType.Return:
+                        return;
+                }
+
+                NextToken();
+            }
+        }
+
+        #region Statements
+
+        /// <summary>
+        /// The most general classification of a statement.
+        /// Every statement starts here.
+        /// Synchronization is done here.
+        /// </summary>
         private StatementBase Declaration()
         {
             try
@@ -48,6 +104,9 @@ namespace Lang.Interpreter
             }
         }
 
+        /// <summary>
+        /// Consumes a variable declaration statement.
+        /// </summary>
         private StatementBase VarDeclaration()
         {
             var name = Consume(TokenType.Identifier, "Expected identifier.");
@@ -62,6 +121,11 @@ namespace Lang.Interpreter
             return new VarStatement(name, initializer);
         }
 
+        /// <summary>
+        /// Branches to <see cref="PrintStatement"/>,
+        /// <see cref="BlockStatement"/>,
+        /// or <see cref="ExpressionStatement"/>.
+        /// </summary>
         private StatementBase Statement()
         {
             if (NextTokenMatches(TokenType.Print))
@@ -77,6 +141,19 @@ namespace Lang.Interpreter
             return ExpressionStatement();
         }
 
+        /// <summary>
+        /// Consumes a print statement.
+        /// </summary>
+        private PrintStatement PrintStatement()
+        {
+            var expression = Expression();
+            Consume(TokenType.SemiColon, "Expected ';' after value to print.");
+            return new PrintStatement(expression);
+        }
+
+        /// <summary>
+        /// Consumes a block.
+        /// </summary>
         private List<StatementBase> BlockStatement()
         {
             var statements = new List<StatementBase>();
@@ -90,6 +167,9 @@ namespace Lang.Interpreter
             return statements;
         }
 
+        /// <summary>
+        /// Consumes an expression.
+        /// </summary>
         private ExpressionStatement ExpressionStatement()
         {
             var expression = Expression();
@@ -97,16 +177,15 @@ namespace Lang.Interpreter
             return new ExpressionStatement(expression);
         }
 
-        private PrintStatement PrintStatement()
-        {
-            var expression = Expression();
-            Consume(TokenType.SemiColon, "Expected ';' after value to print.");
-            return new PrintStatement(expression);
-        }
+        #endregion
 
+        #region Expressions
+
+        /// <summary>
+        /// Kicks off the expression classfication by calling the expression method of lowest precedence.
+        /// </summary>
         private ExpressionBase Expression()
         {
-            // start with the lowest precedence expression type
             return Assignment();
         }
 
@@ -243,36 +322,14 @@ namespace Lang.Interpreter
             throw Error(Peek(), "Expression expected.");
         }
 
-        private void Synchronize()
-        {
-            NextToken();
+        #endregion
 
-            // look for the end of the current statement or the beginning of the next
-            // so that we can continue parsing after an error has been detected
-            while (!_atEndOfTokens)
-            {
-                if (_currentToken.Type == TokenType.SemiColon)
-                {
-                    return;
-                }
+        #region Helpers
 
-                switch (Peek().Type)
-                {
-                    case TokenType.Class:
-                    case TokenType.Fun:
-                    case TokenType.Var:
-                    case TokenType.If:
-                    case TokenType.For:
-                    case TokenType.While:
-                    case TokenType.Print:
-                    case TokenType.Return:
-                        return;
-                }
-
-                NextToken();
-            }
-        }
-
+        /// <summary>
+        /// Advances <see cref="_current"/> if possible, and grabs the new <see cref="_currentToken"/>.
+        /// </summary>
+        /// <returns><see cref="_currentToken"/></returns>
         private Token NextToken()
         {
             if (!_atEndOfTokens)
@@ -283,8 +340,18 @@ namespace Lang.Interpreter
             return _currentToken;
         }
 
+        /// <summary>
+        /// Peeks the next token without advancing.
+        /// </summary>
+        /// <returns>The next token.</returns>
         private Token Peek() => _tokens[_current];
 
+        /// <summary>
+        /// Checks to see if the next token matches one of the passed token types.
+        /// Advances to it if it does.
+        /// </summary>
+        /// <param name="tokenTypes">Token types to match.</param>
+        /// <returns>True if the next token matches one of the passed token types.</returns>
         private bool NextTokenMatches(params TokenType[] tokenTypes)
         {
             foreach (var tokenType in tokenTypes)
@@ -299,8 +366,20 @@ namespace Lang.Interpreter
             return false;
         }
 
+        /// <summary>
+        /// Checks to see if the next token matches the passed token type.
+        /// </summary>
+        /// <param name="tokenType">Token type to match.</param>
+        /// <returns>True if the next token matches the passed token type</returns>
         private bool PeekMatches(TokenType tokenType) => !_atEndOfTokens && Peek().Type == tokenType;
 
+        /// <summary>
+        /// Consumes the next token if it is of the passed type.
+        /// Otherwise, <see cref="Error(Token, string)"/> is thrown.
+        /// </summary>
+        /// <param name="tokenType">Token type to match.</param>
+        /// <param name="errorMessage">Error message to display if the token type is not matched.</param>
+        /// <returns>The consumed token.</returns>
         private Token Consume(TokenType tokenType, string errorMessage)
         {
             if (PeekMatches(tokenType))
@@ -311,13 +390,25 @@ namespace Lang.Interpreter
             throw Error(Peek(), errorMessage);
         }
 
+        /// <summary>
+        /// Adds the token and message to the <see cref="ErrorState"/>,
+        /// then returns a <see cref="ParserException"/>.
+        /// </summary>
+        /// <param name="token">Token that was involved in the error.</param>
+        /// <param name="message">Error message to add with the token.</param>
+        /// <returns>A <see cref="ParserException"/>.</returns>
         private ParserException Error(Token token, string message)
         {
             ErrorState.AddError(token, message);
             return new ParserException();
         }
+
+        #endregion
     }
 
+    /// <summary>
+    /// An exception thrown when a parsing error is encountered.
+    /// </summary>
     class ParserException : Exception
     {
     }
