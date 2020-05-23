@@ -1,4 +1,6 @@
-﻿namespace Lang.Interpreter
+﻿using System.Collections.Generic;
+
+namespace Lang.Interpreter
 {
     /// <summary>
     /// Base class for all statements.
@@ -52,6 +54,21 @@
         public override void Accept(IStatementVisitor visitor)
         {
             visitor.VisitVarStatement(this);
+        }
+    }
+
+    public class BlockStatement : StatementBase
+    {
+        public List<StatementBase> Statements { get; }
+
+        public BlockStatement(List<StatementBase> statements)
+        {
+            Statements = statements;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitBlockStatement(this);
         }
     }
 }

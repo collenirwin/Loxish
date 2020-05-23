@@ -8,13 +8,19 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
-        private readonly EnvironmentState _environment = new EnvironmentState();
+        private EnvironmentState _environment = new EnvironmentState();
 
         /// <summary>
         /// Has a <see cref="RuntimeException"/> been thrown?
         /// </summary>
         public bool RuntimeExceptionThrown { get; private set; }
 
+        #region Execution
+
+        /// <summary>
+        /// Interprets and executes the given statements.
+        /// </summary>
+        /// <param name="statements">Statements to execute.</param>
         public void Interpret(List<StatementBase> statements)
         {
             RuntimeExceptionThrown = false;
@@ -32,6 +38,56 @@ namespace Lang.Interpreter
                 ErrorReporter.ReportRuntimeException(ex);
             }
         }
+
+        /// <summary>
+        /// Runs the statement's <see cref="StatementBase.Accept(IStatementVisitor)"/> method.
+        /// </summary>
+        /// <param name="statement">Statement to execute.</param>
+        private void Execute(StatementBase statement)
+        {
+            statement.Accept(this);
+        }
+
+        /// <summary>
+        /// <see cref="Execute(StatementBase)"/>s all statements in a block.
+        /// </summary>
+        /// <param name="statements">Statements to execute.</param>
+        /// <param name="environment">The block's environment.</param>
+        private void ExecuteBlock(List<StatementBase> statements, EnvironmentState environment)
+        {
+            // hang on to the current scope
+            var outerEnvironment = _environment;
+
+            try
+            {
+                // our scope is now this block's scope
+                _environment = environment;
+
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                // restore to the first scope
+                _environment = outerEnvironment;
+            }
+        }
+
+        /// <summary>
+        /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/> method.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/>.</returns>
+        private object Evaluate(ExpressionBase expression)
+        {
+            return expression.Accept(this);
+        }
+
+        #endregion
+
+        #region Expression visitation
 
         /// <summary>
         /// Evaluates a binary expression.
@@ -141,24 +197,56 @@ namespace Lang.Interpreter
             return value;
         }
 
+        #endregion
+
+        #region Statement visitation
+
         /// <summary>
-        /// Runs the statement's <see cref="StatementBase.Accept(IStatementVisitor)"/> method.
+        /// Runs an expression statement.
         /// </summary>
-        /// <param name="statement">Statement to execute.</param>
-        private void Execute(StatementBase statement)
+        /// <param name="statement">Statement to run.</param>
+        public void VisitExpressionStatement(ExpressionStatement statement)
         {
-            statement.Accept(this);
+            Evaluate(statement.Expression);
         }
 
         /// <summary>
-        /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/> method.
+        /// Runs a print statement.
         /// </summary>
-        /// <param name="expression">Expression to evaluate.</param>
-        /// <returns>The result of <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/>.</returns>
-        private object Evaluate(ExpressionBase expression)
+        /// <param name="statement">Statement to run.</param>
+        public void VisitPrintStatement(PrintStatement statement)
         {
-            return expression.Accept(this);
+            var value = Evaluate(statement.Expression);
+            Console.WriteLine(Stringify(value));
         }
+
+        /// <summary>
+        /// Runs a var statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitVarStatement(VarStatement statement)
+        {
+            object value = null;
+            if (statement.Initializer != null)
+            {
+                value = Evaluate(statement.Initializer);
+            }
+
+            _environment.Define(statement.Name.WrappedSource, value);
+        }
+
+        /// <summary>
+        /// Runs a block statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitBlockStatement(BlockStatement statement)
+        {
+            ExecuteBlock(statement.Statements, new EnvironmentState(_environment));
+        }
+
+        #endregion
+
+        #region Helpers
 
         /// <summary>
         /// Determines if an object is 'truthy',
@@ -260,7 +348,11 @@ namespace Lang.Interpreter
             return value1?.Equals(value2) ?? false;
         }
 
-        // TODO: keep this updated
+        /// <summary>
+        /// Gets a string representation of an object.
+        /// </summary>
+        /// <param name="value">Object to stringify.</param>
+        /// <returns>A string representation of the passed object.</returns>
         private string Stringify(object value)
         {
             if (value is null)
@@ -271,26 +363,6 @@ namespace Lang.Interpreter
             return value.ToString();
         }
 
-        public void VisitExpressionStatement(ExpressionStatement statement)
-        {
-            Evaluate(statement.Expression);
-        }
-
-        public void VisitPrintStatement(PrintStatement statement)
-        {
-            var value = Evaluate(statement.Expression);
-            Console.WriteLine(Stringify(value));
-        }
-
-        public void VisitVarStatement(VarStatement statement)
-        {
-            object value = null;
-            if (statement.Initializer != null)
-            {
-                value = Evaluate(statement.Initializer);
-            }
-
-            _environment.Define(statement.Name.WrappedSource, value);
-        }
+        #endregion
     }
 }

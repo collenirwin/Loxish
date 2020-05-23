@@ -69,7 +69,25 @@ namespace Lang.Interpreter
                 return PrintStatement();
             }
 
+            if (NextTokenMatches(TokenType.LeftCurlyBrace))
+            {
+                return new BlockStatement(BlockStatement());
+            }
+
             return ExpressionStatement();
+        }
+
+        private List<StatementBase> BlockStatement()
+        {
+            var statements = new List<StatementBase>();
+
+            while (!PeekMatches(TokenType.RightCurlyBrace) && !_atEndOfTokens)
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(TokenType.RightCurlyBrace, "Expected closing '}'.");
+            return statements;
         }
 
         private ExpressionStatement ExpressionStatement()
