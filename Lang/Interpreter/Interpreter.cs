@@ -1,4 +1,6 @@
-﻿namespace Lang.Interpreter
+﻿using System;
+
+namespace Lang.Interpreter
 {
     /// <summary>
     /// Executes expressions.
@@ -30,14 +32,11 @@
 
                     throw new RuntimeException(expression.Operator, "Invalid operand(s) for '+'.");
                 case TokenType.Minus:
-                    AssertOperandsAreNumbers(left, right, expression.Operator);
-                    return (double)left - (double)right;
+                    return RunOperationAsNumbers(left, right, expression.Operator, (l, r) => l - r);
                 case TokenType.Star:
-                    AssertOperandsAreNumbers(left, right, expression.Operator);
-                    return (double)left * (double)right;
+                    return RunOperationAsNumbers(left, right, expression.Operator, (l, r) => l * r);
                 case TokenType.Slash:
-                    AssertOperandsAreNumbers(left, right, expression.Operator);
-                    return (double)left / (double)right;
+                    return RunOperationAsNumbers(left, right, expression.Operator, (l, r) => l / r);
 
                 case TokenType.DoubleEqual:
                     return AreEqual(left, right);
@@ -45,17 +44,13 @@
                     return !AreEqual(left, right);
 
                 case TokenType.LessThan:
-                    AssertOperandsAreComparable(left, right, expression.Operator);
-                    return (double)left < (double)right;
+                    return Compare(left, right, expression.Operator) < 0;
                 case TokenType.LessThanOrEqual:
-                    AssertOperandsAreComparable(left, right, expression.Operator);
-                    return (double)left <= (double)right;
+                    return Compare(left, right, expression.Operator) <= 0;
                 case TokenType.GreaterThan:
-                    AssertOperandsAreComparable(left, right, expression.Operator);
-                    return (double)left > (double)right;
+                    return Compare(left, right, expression.Operator) > 0;
                 case TokenType.GreaterThanOrEqual:
-                    AssertOperandsAreComparable(left, right, expression.Operator);
-                    return (double)left >= (double)right;
+                    return Compare(left, right, expression.Operator) >= 0;
             }
 
             throw new RuntimeException(expression.Operator, "Invalid binary expression.");
@@ -131,34 +126,48 @@
         }
 
         /// <summary>
-        /// Throws a <see cref="RuntimeException"/> if either operand is not a number.
+        /// Runs the operation if both operands are numbers, otherise throws a <see cref="RuntimeException"/>.
         /// </summary>
-        /// <param name="leftOperand">Left operand to check.</param>
-        /// <param name="rightOperand">Right operand to check.</param>
+        /// <typeparam name="T">Return type of the operation.</typeparam>
+        /// <param name="leftOperand">Left operand to cast to a number.</param>
+        /// <param name="rightOperand">Right operand to cast to a number.</param>
         /// <param name="operator">Operator to include in the exception on failure.</param>
+        /// <param name="operation">Operation to perform with the operands.</param>
         /// <exception cref="RuntimeException"/>
-        private void AssertOperandsAreNumbers(object leftOperand, object rightOperand, Token @operator)
+        /// <returns>The result of the operation.</returns>
+        private T RunOperationAsNumbers<T>(object leftOperand, object rightOperand, Token @operator,
+            Func<double, double, T> operation)
         {
-            if (!(leftOperand is double) || !(rightOperand is double))
+            if (leftOperand is double leftNumber && rightOperand is double rightNumber)
             {
-                throw new RuntimeException(@operator, "Operands must be a numbers.");
+                return operation(leftNumber, rightNumber);
             }
+
+            throw new RuntimeException(@operator, "Operands must be a numbers.");
         }
 
         /// <summary>
-        /// Throws a <see cref="RuntimeException"/> if operands are not both doubles or both strings.
+        /// Returns the result of a comparison between the left and right operands,
+        /// or throw a <see cref="RuntimeException"/> if the operands are not comparable.
         /// </summary>
-        /// <param name="leftOperand">Left operand to check.</param>
-        /// <param name="rightOperand">Right operand to check.</param>
+        /// <param name="leftOperand">Left operand to compare.</param>
+        /// <param name="rightOperand">Right operand to compare.</param>
         /// <param name="operator">Operator to include in the exception on failure.</param>
         /// <exception cref="RuntimeException"/>
-        private void AssertOperandsAreComparable(object leftOperand, object rightOperand, Token @operator)
+        /// <returns>The result of the comparison.</returns>
+        private int Compare(object leftOperand, object rightOperand, Token @operator)
         {
-            if ((!(leftOperand is double) || !(rightOperand is double)) &&
-                (!(leftOperand is string) || !(rightOperand is string)))
+            if (leftOperand is double leftNumber && rightOperand is double rightNumber)
             {
-                throw new RuntimeException(@operator, "Operands must be a numbers or strings.");
+                return leftNumber.CompareTo(rightNumber);
             }
+
+            if (leftOperand is string leftString && rightOperand is string rightString)
+            {
+                return leftString.CompareTo(rightString);
+            }
+
+            throw new RuntimeException(@operator, "Both operands must be comparable to each other.");
         }
 
         /// <summary>
@@ -168,6 +177,7 @@
         /// <param name="operand">Operand to cast.</param>
         /// <param name="operator">Operator to include in the exception on failure.</param>
         /// <exception cref="RuntimeException"/>
+        /// <returns>The operand as a double.</returns>
         private double CastOperandToNumber(object operand, Token @operator)
         {
             if (operand is double number)
