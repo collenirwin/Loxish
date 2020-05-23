@@ -104,11 +104,13 @@
     public class AssignmentExpression : ExpressionBase
     {
         public Token Name { get; }
+        public Token Operator { get; }
         public ExpressionBase Value { get; }
 
-        public AssignmentExpression(Token name, ExpressionBase value)
+        public AssignmentExpression(Token name, Token @operator, ExpressionBase value)
         {
             Name = name;
+            Operator = @operator;
             Value = value;
         }
 

@@ -218,19 +218,18 @@ namespace Lang.Interpreter
         {
             var expression = Binary();
 
-            if (NextTokenMatches(TokenType.Equal))
+            if (NextTokenMatches(TokenType.Equal, TokenType.PlusEqual, TokenType.MinusEqual))
             {
-                // just hanging on to this in case we need to throw a syntax error
-                var equalToken = _currentToken;
+                var @operator = _currentToken;
                 var value = Assignment();
 
                 if (expression is VariableExpression variableExpression)
                 {
                     var name = variableExpression.Name;
-                    return new AssignmentExpression(name, value);
+                    return new AssignmentExpression(name, @operator, value);
                 }
 
-                Error(equalToken, "Invalid assignment target.");
+                Error(@operator, "Invalid assignment target.");
             }
 
             return expression;

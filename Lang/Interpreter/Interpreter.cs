@@ -203,6 +203,18 @@ namespace Lang.Interpreter
         public object VisitAssignmentExpression(AssignmentExpression expression)
         {
             var value = Evaluate(expression.Value);
+
+            if (expression.Operator.Type == TokenType.PlusEqual)
+            {
+                value = RunOperationAsNumbers(_environment.GetValue(expression.Name), value, expression.Operator,
+                    (var, val) => var + val);
+            }
+            else if (expression.Operator.Type == TokenType.MinusEqual)
+            {
+                value = RunOperationAsNumbers(_environment.GetValue(expression.Name), value, expression.Operator,
+                    (var, val) => var - val);
+            }
+
             _environment.Assign(expression.Name, value);
             return value;
         }

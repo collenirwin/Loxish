@@ -100,12 +100,6 @@ namespace Lang.Interpreter
                 case '.':
                     AddToken(TokenType.Dot);
                     break;
-                case '+':
-                    AddToken(TokenType.Plus);
-                    break;
-                case '-':
-                    AddToken(TokenType.Minus);
-                    break;
                 case '*':
                     AddToken(TokenType.Star);
                     break;
@@ -128,6 +122,12 @@ namespace Lang.Interpreter
                     break;
                 case '>':
                     AddToken(NextCharIs('=') ? TokenType.GreaterThanOrEqual : TokenType.GreaterThan);
+                    break;
+                case '+':
+                    AddToken(NextCharIs('=') ? TokenType.PlusEqual : TokenType.Plus);
+                    break;
+                case '-':
+                    AddToken(NextCharIs('=') ? TokenType.MinusEqual : TokenType.Minus);
                     break;
                 case '&':
                     AddToken(NextCharIs('&') ? TokenType.DoubleAmp : TokenType.Amp);
