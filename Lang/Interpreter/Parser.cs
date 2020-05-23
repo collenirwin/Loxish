@@ -24,10 +24,42 @@ namespace Lang.Interpreter
 
             while (!_atEndOfTokens)
             {
-                statements.Add(Statement());
+                statements.Add(Declaration());
             }
 
             return statements;
+        }
+
+        private StatementBase Declaration()
+        {
+            try
+            {
+                if (NextTokenMatches(TokenType.Var))
+                {
+                    return VarDeclaration();
+                }
+
+                return Statement();
+            }
+            catch (ParserException)
+            {
+                Synchronize();
+                return null;
+            }
+        }
+
+        private StatementBase VarDeclaration()
+        {
+            var name = Consume(TokenType.Identifier, "Expected identifier.");
+            ExpressionBase initializer = null;
+
+            if (NextTokenMatches(TokenType.Equal))
+            {
+                initializer = Expression();
+            }
+
+            Consume(TokenType.SemiColon, "Expected ';' after variable declaration.");
+            return new VarStatement(name, initializer);
         }
 
         private StatementBase Statement()
@@ -153,6 +185,11 @@ namespace Lang.Interpreter
             if (NextTokenMatches(TokenType.String, TokenType.Number))
             {
                 return new LiteralExpression(_currentToken.Value);
+            }
+
+            if (NextTokenMatches(TokenType.Var))
+            {
+                return new VariableExpression(_currentToken);
             }
 
             if (NextTokenMatches(TokenType.LeftParen))

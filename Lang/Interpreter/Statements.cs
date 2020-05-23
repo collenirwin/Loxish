@@ -37,4 +37,21 @@
             visitor.VisitPrintStatement(this);
         }
     }
+
+    public class VarStatement : StatementBase
+    {
+        public Token Name { get; }
+        public ExpressionBase Initializer { get; }
+
+        public VarStatement(Token name, ExpressionBase initializer)
+        {
+            Name = name;
+            Initializer = initializer;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitVarStatement(this);
+        }
+    }
 }

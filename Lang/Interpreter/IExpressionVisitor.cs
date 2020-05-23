@@ -10,5 +10,6 @@
         T VisitBinaryExpression(BinaryExpression expression);
         T VisitGroupingExpression(GroupingExpression expression);
         T VisitLiteralExpression(LiteralExpression expression);
+        T VisitVariableExpression(VariableExpression expression);
     }
 }
