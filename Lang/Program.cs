@@ -51,7 +51,7 @@ namespace Lang
             var lexer = new Lexer(source, errorState);
             var tokens = lexer.Tokenize();
             var parser = new Parser(tokens, errorState);
-            var expression = parser.Parse();
+            var statements = parser.Parse();
 
             if (errorState.HasErrors)
             {
@@ -59,7 +59,7 @@ namespace Lang
                 return 2;
             }
 
-            _interpreter.Interpret(expression);
+            _interpreter.Interpret(statements);
             return _interpreter.RuntimeExceptionThrown ? 3 : 1;
         }
     }

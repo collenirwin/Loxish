@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lang.Interpreter
 {
@@ -12,14 +13,16 @@ namespace Lang.Interpreter
         /// </summary>
         public bool RuntimeExceptionThrown { get; private set; }
 
-        public void Interpret(ExpressionBase expression)
+        public void Interpret(List<StatementBase> statements)
         {
             RuntimeExceptionThrown = false;
 
             try
             {
-                var value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeException ex)
             {
@@ -115,8 +118,16 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
-        /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/>
-        /// method.
+        /// Runs the statement's <see cref="StatementBase.Accept(IStatementVisitor)"/> method.
+        /// </summary>
+        /// <param name="statement">Statement to execute.</param>
+        private void Execute(StatementBase statement)
+        {
+            statement.Accept(this);
+        }
+
+        /// <summary>
+        /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/> method.
         /// </summary>
         /// <param name="expression">Expression to evaluate.</param>
         /// <returns>The result of <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/>.</returns>

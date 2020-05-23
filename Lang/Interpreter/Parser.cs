@@ -212,7 +212,7 @@ namespace Lang.Interpreter
         {
             foreach (var tokenType in tokenTypes)
             {
-                if (NextTokenMatches(tokenType))
+                if (PeekMatches(tokenType))
                 {
                     NextToken();
                     return true;
@@ -222,11 +222,11 @@ namespace Lang.Interpreter
             return false;
         }
 
-        private bool NextTokenMatches(TokenType tokenType) => !_atEndOfTokens && Peek().Type == tokenType;
+        private bool PeekMatches(TokenType tokenType) => !_atEndOfTokens && Peek().Type == tokenType;
 
         private Token Consume(TokenType tokenType, string errorMessage)
         {
-            if (NextTokenMatches(tokenType))
+            if (PeekMatches(tokenType))
             {
                 return NextToken();
             }
