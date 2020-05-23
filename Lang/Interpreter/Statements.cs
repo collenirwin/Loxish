@@ -71,4 +71,23 @@ namespace Lang.Interpreter
             visitor.VisitBlockStatement(this);
         }
     }
+
+    public class IfStatement : StatementBase
+    {
+        public ExpressionBase Condition { get; }
+        public StatementBase ThenBranch { get; }
+        public StatementBase ElseBranch { get; }
+
+        public IfStatement(ExpressionBase condition, StatementBase thenBranch, StatementBase elseBranch)
+        {
+            Condition = condition;
+            ThenBranch = thenBranch;
+            ElseBranch = elseBranch;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitIfStatement(this);
+        }
+    }
 }

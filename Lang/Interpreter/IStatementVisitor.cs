@@ -9,5 +9,6 @@
         void VisitPrintStatement(PrintStatement statement);
         void VisitVarStatement(VarStatement statement);
         void VisitBlockStatement(BlockStatement statement);
+        void VisitIfStatement(IfStatement statement);
     }
 }

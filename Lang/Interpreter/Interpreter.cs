@@ -244,6 +244,22 @@ namespace Lang.Interpreter
             ExecuteBlock(statement.Statements, new EnvironmentState(_environment));
         }
 
+        /// <summary>
+        /// Runs an if statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitIfStatement(IfStatement statement)
+        {
+            if (IsTruthy(statement.Condition))
+            {
+                Execute(statement.ThenBranch);
+            }
+            else if (statement.ElseBranch != null)
+            {
+                Execute(statement.ElseBranch);
+            }
+        }
+
         #endregion
 
         #region Helpers
@@ -266,7 +282,7 @@ namespace Lang.Interpreter
                 return d != 0.0;
             }
 
-            return true;
+            return !(value is null);
         }
 
         /// <summary>

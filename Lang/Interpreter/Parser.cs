@@ -128,6 +128,11 @@ namespace Lang.Interpreter
         /// </summary>
         private StatementBase Statement()
         {
+            if (NextTokenMatches(TokenType.If))
+            {
+                return IfStatement();
+            }
+
             if (NextTokenMatches(TokenType.Print))
             {
                 return PrintStatement();
@@ -139,6 +144,26 @@ namespace Lang.Interpreter
             }
 
             return ExpressionStatement();
+        }
+
+        /// <summary>
+        /// Consumes an if statement.
+        /// </summary>
+        private IfStatement IfStatement()
+        {
+            Consume(TokenType.LeftParen, "Expected '(' after 'if'.");
+            var condition = Expression();
+            Consume(TokenType.RightParen, "Expected ')' after 'if' condition.");
+
+            var thenBranch = Statement();
+            StatementBase elseBranch = null;
+
+            if (NextTokenMatches(TokenType.Else))
+            {
+                elseBranch = Statement();
+            }
+
+            return new IfStatement(condition, thenBranch, elseBranch);
         }
 
         /// <summary>
