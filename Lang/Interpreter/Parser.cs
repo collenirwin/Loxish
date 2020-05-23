@@ -89,7 +89,29 @@ namespace Lang.Interpreter
         private ExpressionBase Expression()
         {
             // start with the lowest precedence expression type
-            return Equality();
+            return Assignment();
+        }
+
+        private ExpressionBase Assignment()
+        {
+            var expression = Equality();
+
+            if (NextTokenMatches(TokenType.Equal))
+            {
+                // just hanging on to this in case we need to throw a syntax error
+                var equalToken = _currentToken;
+                var value = Assignment();
+
+                if (expression is VariableExpression variableExpression)
+                {
+                    var name = variableExpression.Name;
+                    return new AssignmentExpression(name, value);
+                }
+
+                Error(equalToken, "Invalid assignment target.");
+            }
+
+            return expression;
         }
 
         private ExpressionBase Equality()

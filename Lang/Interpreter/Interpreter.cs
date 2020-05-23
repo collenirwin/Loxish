@@ -130,6 +130,18 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
+        /// Evaluates an assignment expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitAssignmentExpression(AssignmentExpression expression)
+        {
+            var value = Evaluate(expression.Value);
+            _environment.Assign(expression.Name, value);
+            return value;
+        }
+
+        /// <summary>
         /// Runs the statement's <see cref="StatementBase.Accept(IStatementVisitor)"/> method.
         /// </summary>
         /// <param name="statement">Statement to execute.</param>

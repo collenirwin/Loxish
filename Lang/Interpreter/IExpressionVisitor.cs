@@ -11,5 +11,6 @@
         T VisitGroupingExpression(GroupingExpression expression);
         T VisitLiteralExpression(LiteralExpression expression);
         T VisitVariableExpression(VariableExpression expression);
+        T VisitAssignmentExpression(AssignmentExpression expression);
     }
 }

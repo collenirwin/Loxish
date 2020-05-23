@@ -17,6 +17,11 @@ namespace Lang.Interpreter
             return expression.Accept(this);
         }
 
+        public string VisitAssignmentExpression(AssignmentExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitBinaryExpression(BinaryExpression expression)
         {
             return Parenthesize(expression.Operator.WrappedSource, expression.LeftOperand, expression.RightOperand);

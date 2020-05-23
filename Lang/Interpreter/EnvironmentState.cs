@@ -20,6 +20,22 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
+        /// Assigns a value to an existing variable.
+        /// </summary>
+        /// <param name="name">The variable name token.</param>
+        /// <param name="value">Value of the variable.</param>
+        /// <exception cref="RuntimeException"/>
+        public void Assign(Token name, object value)
+        {
+            if (!_values.ContainsKey(name.WrappedSource))
+            {
+                throw new RuntimeException(name, $"'{name.WrappedSource}' is undefined.");
+            }
+
+            _values[name.WrappedSource] = value;
+        }
+
+        /// <summary>
         /// Gets the value the corresponds with the name token.
         /// </summary>
         /// <param name="name">The variable name token.</param>

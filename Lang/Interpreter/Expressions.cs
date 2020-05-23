@@ -100,4 +100,21 @@
             return visitor.VisitVariableExpression(this);
         }
     }
+
+    public class AssignmentExpression : ExpressionBase
+    {
+        public Token Name { get; }
+        public ExpressionBase Value { get; }
+
+        public AssignmentExpression(Token name, ExpressionBase value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitAssignmentExpression(this);
+        }
+    }
 }
