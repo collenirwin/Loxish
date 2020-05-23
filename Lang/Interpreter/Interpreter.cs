@@ -5,7 +5,7 @@ namespace Lang.Interpreter
     /// <summary>
     /// Executes expressions.
     /// </summary>
-    public class Interpreter : IExpressionVisitor<object>
+    public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
         /// <summary>
         /// Has a <see cref="RuntimeException"/> been thrown?
@@ -225,6 +225,7 @@ namespace Lang.Interpreter
             return value1?.Equals(value2) ?? false;
         }
 
+        // TODO: keep this updated
         private string Stringify(object value)
         {
             if (value is null)
@@ -233,6 +234,17 @@ namespace Lang.Interpreter
             }
 
             return value.ToString();
+        }
+
+        public void VisitExpressionStatement(ExpressionStatement statement)
+        {
+            Evaluate(statement.Expression);
+        }
+
+        public void VisitPrintStatement(PrintStatement statement)
+        {
+            var value = Evaluate(statement.Expression);
+            Console.WriteLine(Stringify(value));
         }
     }
 }

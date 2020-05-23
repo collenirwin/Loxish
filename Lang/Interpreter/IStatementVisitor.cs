@@ -3,10 +3,9 @@
     /// <summary>
     /// Definines a visitor contract for each <see cref="StatementBase"/> type.
     /// </summary>
-    /// <typeparam name="T">Type resulting from each Visit method.</typeparam>
-    public interface IStatementVisitor<T>
+    public interface IStatementVisitor
     {
-        T VisitExpressionStatement(ExpressionStatement statement);
-        T VisitPrintStatement(PrintStatement statement);
+        void VisitExpressionStatement(ExpressionStatement statement);
+        void VisitPrintStatement(PrintStatement statement);
     }
 }

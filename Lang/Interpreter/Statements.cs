@@ -5,7 +5,7 @@
     /// </summary>
     public abstract class StatementBase
     {
-        public abstract T Accept<T>(IStatementVisitor<T> visitor);
+        public abstract void Accept(IStatementVisitor visitor);
     }
 
     public class ExpressionStatement : StatementBase
@@ -17,9 +17,9 @@
             Expression = expression;
         }
 
-        public override T Accept<T>(IStatementVisitor<T> visitor)
+        public override void Accept(IStatementVisitor visitor)
         {
-            return visitor.VisitExpressionStatement(this);
+            visitor.VisitExpressionStatement(this);
         }
     }
 
@@ -32,9 +32,9 @@
             Expression = expression;
         }
 
-        public override T Accept<T>(IStatementVisitor<T> visitor)
+        public override void Accept(IStatementVisitor visitor)
         {
-            return visitor.VisitPrintStatement(this);
+            visitor.VisitPrintStatement(this);
         }
     }
 }

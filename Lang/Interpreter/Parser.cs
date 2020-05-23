@@ -18,16 +18,40 @@ namespace Lang.Interpreter
             ErrorState = errorState;
         }
 
-        public ExpressionBase Parse()
+        public List<StatementBase> Parse()
         {
-            try
+            var statements = new List<StatementBase>();
+
+            while (!_atEndOfTokens)
             {
-                return Expression();
+                statements.Add(Statement());
             }
-            catch (ParserException)
+
+            return statements;
+        }
+
+        private StatementBase Statement()
+        {
+            if (NextTokenMatches(TokenType.Print))
             {
-                return null;
+                return PrintStatement();
             }
+
+            return ExpressionStatement();
+        }
+
+        private ExpressionStatement ExpressionStatement()
+        {
+            var expression = Expression();
+            Consume(TokenType.SemiColon, "Expected ';' after expression.");
+            return new ExpressionStatement(expression);
+        }
+
+        private PrintStatement PrintStatement()
+        {
+            var expression = Expression();
+            Consume(TokenType.SemiColon, "Expected ';' after value to print.");
+            return new PrintStatement(expression);
         }
 
         private ExpressionBase Expression()
