@@ -7,6 +7,19 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>
     {
+        public void Interpret(ExpressionBase expression)
+        {
+            try
+            {
+                var value = Evaluate(expression);
+                Console.WriteLine(Stringify(value));
+            }
+            catch (RuntimeException ex)
+            {
+                ErrorReporter.ReportRuntimeException(ex);
+            }
+        }
+
         /// <summary>
         /// Evaluates a binary expression.
         /// </summary>
@@ -202,6 +215,16 @@ namespace Lang.Interpreter
             }
 
             return value1?.Equals(value2) ?? false;
+        }
+
+        private string Stringify(object value)
+        {
+            if (value is null)
+            {
+                return "null";
+            }
+
+            return value.ToString();
         }
     }
 }

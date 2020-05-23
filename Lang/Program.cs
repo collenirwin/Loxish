@@ -53,11 +53,7 @@ namespace Lang
 
             if (errorState.HasErrors)
             {
-                foreach (var error in errorState.Errors)
-                {
-                    Console.WriteLine(error.FullMessage);
-                }
-
+                ErrorReporter.ReportSyntaxErrors(errorState);
                 return 2;
             }
 
