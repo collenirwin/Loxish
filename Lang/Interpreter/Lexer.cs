@@ -21,6 +21,7 @@ namespace Lang.Interpreter
             { "return", TokenType.Return },
             { "for",    TokenType.For },
             { "while",  TokenType.While },
+            { "break",  TokenType.Break },
             { "print",  TokenType.Print },
             { "null",   TokenType.Null }
         };

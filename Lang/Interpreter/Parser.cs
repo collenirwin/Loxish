@@ -11,6 +11,7 @@ namespace Lang.Interpreter
     {
         private readonly List<Token> _tokens;
         private int _current = 0;
+        private int _loopDepth = 0;
 
         private bool _atEndOfTokens => Peek().Type == TokenType.EndOfFile;
         private Token _currentToken => _tokens[_current - 1];
@@ -144,6 +145,11 @@ namespace Lang.Interpreter
                 return ForStatement();
             }
 
+            if (NextTokenMatches(TokenType.Break))
+            {
+                return BreakStatement();
+            }
+
             if (NextTokenMatches(TokenType.Print))
             {
                 return PrintStatement();
@@ -186,10 +192,21 @@ namespace Lang.Interpreter
             var condition = Expression();
             Consume(TokenType.RightParen, "Expected ')' after 'while' condition.");
 
-            var body = Statement();
-            return new WhileStatement(condition, body);
+            try
+            {
+                _loopDepth++;
+                var body = Statement();
+                return new WhileStatement(condition, body);
+            }
+            finally
+            {
+                _loopDepth--;
+            }
         }
 
+        /// <summary>
+        /// Consumes a for statement (desugars into a block-enclosed while loop).
+        /// </summary>
         private StatementBase ForStatement()
         {
             Consume(TokenType.LeftParen, "Expected '(' after 'for'.");
@@ -218,33 +235,55 @@ namespace Lang.Interpreter
 
             Consume(TokenType.RightParen, "Expected ')' after for loop clauses.");
 
-            var body = Statement();
-
-            if (increment != null)
+            try
             {
-                // wrap the body in a block with the increment executing at the end
-                body = new BlockStatement(new[]
+                _loopDepth++;
+                var body = Statement();
+
+                if (increment != null)
                 {
-                    body,
-                    new ExpressionStatement(increment)
-                });
+                    // wrap the body in a block with the increment executing at the end
+                    body = new BlockStatement(new[]
+                    {
+                        body,
+                        new ExpressionStatement(increment)
+                    });
+                }
+
+                // wire up a while loop using the condition and body
+                condition ??= new LiteralExpression(true);
+                body = new WhileStatement(condition, body);
+
+                if (initializer != null)
+                {
+                    // wrap the body in another block with the increment executing first
+                    body = new BlockStatement(new[]
+                    {
+                        initializer,
+                        body
+                    });
+                }
+
+                return body;
+            }
+            finally
+            {
+                _loopDepth--;
+            }
+        }
+
+        /// <summary>
+        /// Consumes a break statement.
+        /// </summary>
+        private StatementBase BreakStatement()
+        {
+            if (_loopDepth == 0)
+            {
+                Error(_currentToken, "'break' must be inside of a loop body.");
             }
 
-            // wire up a while loop using the condition and body
-            condition ??= new LiteralExpression(true);
-            body = new WhileStatement(condition, body);
-
-            if (initializer != null)
-            {
-                // wrap the body in another block with the increment executing first
-                body = new BlockStatement(new[]
-                {
-                    initializer,
-                    body
-                });
-            }
-
-            return body;
+            Consume(TokenType.SemiColon, "Expected ';' after 'break'.");
+            return new BreakStatement();
         }
 
         /// <summary>

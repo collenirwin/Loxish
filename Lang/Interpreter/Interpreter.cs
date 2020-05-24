@@ -317,10 +317,23 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitWhileStatement(WhileStatement statement)
         {
-            while (IsTruthy(Evaluate(statement.Condition)))
+            try
             {
-                Execute(statement.Body);
+                while (IsTruthy(Evaluate(statement.Condition)))
+                {
+                    Execute(statement.Body);
+                }
             }
+            catch (BreakException) { /* exit the loop */ }
+        }
+
+        /// <summary>
+        /// Runs a break statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitBreakStatement(BreakStatement statement)
+        {
+            throw new BreakException();
         }
 
         #endregion
@@ -443,5 +456,12 @@ namespace Lang.Interpreter
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Used to signal a loop break.
+    /// </summary>
+    class BreakException : Exception
+    {
     }
 }

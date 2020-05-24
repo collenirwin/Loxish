@@ -11,5 +11,6 @@
         void VisitBlockStatement(BlockStatement statement);
         void VisitIfStatement(IfStatement statement);
         void VisitWhileStatement(WhileStatement statement);
+        void VisitBreakStatement(BreakStatement statement);
     }
 }

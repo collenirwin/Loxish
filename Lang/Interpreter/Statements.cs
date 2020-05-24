@@ -107,4 +107,12 @@ namespace Lang.Interpreter
             visitor.VisitWhileStatement(this);
         }
     }
+
+    public class BreakStatement : StatementBase
+    {
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitBreakStatement(this);
+        }
+    }
 }

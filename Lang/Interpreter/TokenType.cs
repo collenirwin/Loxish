@@ -51,6 +51,7 @@
         Return,
         For,
         While,
+        Break,
         Print,
         Null,
 
