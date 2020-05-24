@@ -13,5 +13,6 @@
         T VisitVariableExpression(VariableExpression expression);
         T VisitAssignmentExpression(AssignmentExpression expression);
         T VisitLogicalExpression(LogicalExpression expression);
+        T VisitCallExpression(CallExpression expression);
     }
 }

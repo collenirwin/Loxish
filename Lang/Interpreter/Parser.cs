@@ -467,7 +467,40 @@ namespace Lang.Interpreter
                 return new UnaryExpression(right, @operator);
             }
 
-            return Primary();
+            return Call();
+        }
+
+        private ExpressionBase Call()
+        {
+            var expression = Primary();
+
+            while (NextTokenMatches(TokenType.LeftParen))
+            {
+                expression = FinishCall(expression);
+            }
+
+            return expression;
+        }
+
+        private ExpressionBase FinishCall(ExpressionBase expression)
+        {
+            var arguments = new List<ExpressionBase>();
+
+            if (!PeekMatches(TokenType.RightParen)) // no args?
+            {
+                do // at least one arg
+                {
+                    if (arguments.Count > 255)
+                    {
+                        Error(Peek(), "Cannot have more than 255 arguments.");
+                    }
+
+                    arguments.Add(Expression());
+                } while (NextTokenMatches(TokenType.Comma)); // more args?
+            }
+
+            var closingParen = Consume(TokenType.RightParen, "Expected ')' after arguments.");
+            return new CallExpression(expression, arguments, closingParen);
         }
 
         private ExpressionBase Primary()

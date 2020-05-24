@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Lang.Interpreter.NativeFunctions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lang.Interpreter
 {
@@ -8,7 +10,8 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
-        private EnvironmentState _environment = new EnvironmentState();
+        private readonly EnvironmentState _globalScope = new EnvironmentState();
+        private EnvironmentState _environment;
 
         /// <summary>
         /// Has a <see cref="RuntimeException"/> been thrown?
@@ -24,6 +27,8 @@ namespace Lang.Interpreter
         public void Interpret(IEnumerable<StatementBase> statements)
         {
             RuntimeExceptionThrown = false;
+            _environment = _globalScope;
+            PrepareGlobalScope();
 
             try
             {
@@ -248,6 +253,32 @@ namespace Lang.Interpreter
             return Evaluate(expression.RightOperand);
         }
 
+        /// <summary>
+        /// Evaluates a call expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitCallExpression(CallExpression expression)
+        {
+            var callee = Evaluate(expression.Callee);
+            var argumentValues = expression.Arguments
+                .Select(argument => Evaluate(argument))
+                .ToList();
+
+            if (!(callee is ICallable function))
+            {
+                throw new RuntimeException(expression.ClosingParen, "Expression does not support calling.");
+            }
+
+            if (function.ArgumentCount != argumentValues.Count)
+            {
+                throw new RuntimeException(expression.ClosingParen,
+                    $"Expected {function.ArgumentCount} arguments but got {argumentValues.Count}.");
+            }
+
+            return function.Call(this, argumentValues);
+        }
+
         #endregion
 
         #region Statement visitation
@@ -453,6 +484,14 @@ namespace Lang.Interpreter
             }
 
             return value.ToString();
+        }
+
+        /// <summary>
+        /// Adds all native functions to the <see cref="_globalScope"/>.
+        /// </summary>
+        private void PrepareGlobalScope()
+        {
+            _globalScope.Define("__SysClockSeconds", new SysClockSeconds());
         }
 
         #endregion

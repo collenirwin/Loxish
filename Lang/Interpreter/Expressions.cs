@@ -1,4 +1,6 @@
-﻿namespace Lang.Interpreter
+﻿using System.Collections.Generic;
+
+namespace Lang.Interpreter
 {
     /// <summary>
     /// Base class for all expressions.
@@ -136,6 +138,26 @@
         public override T Accept<T>(IExpressionVisitor<T> visitor)
         {
             return visitor.VisitLogicalExpression(this);
+        }
+    }
+
+    public class CallExpression : ExpressionBase
+    {
+        public ExpressionBase Callee { get; }
+        public IEnumerable<ExpressionBase> Arguments { get; }
+        public Token ClosingParen { get; }
+
+        public CallExpression(ExpressionBase callee,
+            IEnumerable<ExpressionBase> arguments, Token closingParen)
+        {
+            Callee = callee;
+            Arguments = arguments;
+            ClosingParen = closingParen;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitCallExpression(this);
         }
     }
 }

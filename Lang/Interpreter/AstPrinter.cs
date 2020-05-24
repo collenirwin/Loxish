@@ -27,6 +27,11 @@ namespace Lang.Interpreter
             return Parenthesize(expression.Operator.WrappedSource, expression.LeftOperand, expression.RightOperand);
         }
 
+        public string VisitCallExpression(CallExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitGroupingExpression(GroupingExpression expression)
         {
             return Parenthesize("group", expression.Expression);
