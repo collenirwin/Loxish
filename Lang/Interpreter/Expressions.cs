@@ -119,4 +119,23 @@
             return visitor.VisitAssignmentExpression(this);
         }
     }
+
+    public class LogicalExpression : ExpressionBase
+    {
+        public ExpressionBase LeftOperand { get; }
+        public ExpressionBase RightOperand { get; }
+        public Token Operator { get; }
+
+        public LogicalExpression(ExpressionBase left, ExpressionBase right, Token @operator)
+        {
+            LeftOperand = left;
+            RightOperand = right;
+            Operator = @operator;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitLogicalExpression(this);
+        }
+    }
 }

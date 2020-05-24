@@ -37,6 +37,11 @@ namespace Lang.Interpreter
             return expression.Value?.ToString() ?? "null";
         }
 
+        public string VisitLogicalExpression(LogicalExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitUnaryExpression(UnaryExpression expression)
         {
             return Parenthesize(expression.Operator.WrappedSource, expression.Operand);

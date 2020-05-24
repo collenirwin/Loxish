@@ -12,5 +12,6 @@
         T VisitLiteralExpression(LiteralExpression expression);
         T VisitVariableExpression(VariableExpression expression);
         T VisitAssignmentExpression(AssignmentExpression expression);
+        T VisitLogicalExpression(LogicalExpression expression);
     }
 }

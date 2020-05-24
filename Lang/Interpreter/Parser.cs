@@ -216,7 +216,7 @@ namespace Lang.Interpreter
 
         private ExpressionBase Assignment()
         {
-            var expression = Binary();
+            var expression = LogicalOr();
 
             if (NextTokenMatches(TokenType.Equal, TokenType.PlusEqual, TokenType.MinusEqual))
             {
@@ -230,6 +230,34 @@ namespace Lang.Interpreter
                 }
 
                 Error(@operator, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        private ExpressionBase LogicalOr()
+        {
+            var expression = LogicalAnd();
+
+            while (NextTokenMatches(TokenType.DoublePipe))
+            {
+                var @operator = _currentToken;
+                var right = LogicalAnd();
+                expression = new LogicalExpression(expression, right, @operator);
+            }
+
+            return expression;
+        }
+
+        private ExpressionBase LogicalAnd()
+        {
+            var expression = Binary();
+
+            while (NextTokenMatches(TokenType.DoubleAmp))
+            {
+                var @operator = _currentToken;
+                var right = Binary();
+                expression = new LogicalExpression(expression, right, @operator);
             }
 
             return expression;

@@ -219,6 +219,34 @@ namespace Lang.Interpreter
             return value;
         }
 
+        /// <summary>
+        /// Evaluates a logical expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitLogicalExpression(LogicalExpression expression)
+        {
+            var leftValue = Evaluate(expression.LeftOperand);
+
+            // see if we can short-circuit
+            if (expression.Operator.Type == TokenType.DoublePipe) // or
+            {
+                if (IsTruthy(leftValue))
+                {
+                    return leftValue;
+                }
+            }
+            else // and
+            {
+                if (!IsTruthy(leftValue))
+                {
+                    return leftValue;
+                }
+            }
+
+            return Evaluate(expression.RightOperand);
+        }
+
         #endregion
 
         #region Statement visitation
@@ -272,7 +300,7 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitIfStatement(IfStatement statement)
         {
-            if (IsTruthy(statement.Condition))
+            if (IsTruthy(Evaluate(statement.Condition)))
             {
                 Execute(statement.ThenBranch);
             }
