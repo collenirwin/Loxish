@@ -90,4 +90,21 @@ namespace Lang.Interpreter
             visitor.VisitIfStatement(this);
         }
     }
+
+    public class WhileStatement : StatementBase
+    {
+        public ExpressionBase Condition { get; }
+        public StatementBase Body { get; }
+
+        public WhileStatement(ExpressionBase condition, StatementBase body)
+        {
+            Condition = condition;
+            Body = body;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitWhileStatement(this);
+        }
+    }
 }

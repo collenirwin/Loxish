@@ -133,6 +133,11 @@ namespace Lang.Interpreter
                 return IfStatement();
             }
 
+            if (NextTokenMatches(TokenType.While))
+            {
+                return WhileStatement();
+            }
+
             if (NextTokenMatches(TokenType.Print))
             {
                 return PrintStatement();
@@ -164,6 +169,19 @@ namespace Lang.Interpreter
             }
 
             return new IfStatement(condition, thenBranch, elseBranch);
+        }
+
+        /// <summary>
+        /// Consumes a while statement.
+        /// </summary>
+        private StatementBase WhileStatement()
+        {
+            Consume(TokenType.LeftParen, "Expected '(' after 'while'.");
+            var condition = Expression();
+            Consume(TokenType.RightParen, "Expected ')' after 'while' condition.");
+
+            var body = Statement();
+            return new WhileStatement(condition, body);
         }
 
         /// <summary>

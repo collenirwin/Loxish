@@ -77,6 +77,7 @@ namespace Lang.Interpreter
 
         /// <summary>
         /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/> method.
+        /// This will essentially compute the value of the expression and return it.
         /// </summary>
         /// <param name="expression">Expression to evaluate.</param>
         /// <returns>The result of <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/>.</returns>
@@ -307,6 +308,18 @@ namespace Lang.Interpreter
             else if (statement.ElseBranch != null)
             {
                 Execute(statement.ElseBranch);
+            }
+        }
+
+        /// <summary>
+        /// Runs a while statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitWhileStatement(WhileStatement statement)
+        {
+            while (IsTruthy(Evaluate(statement.Condition)))
+            {
+                Execute(statement.Body);
             }
         }
 
