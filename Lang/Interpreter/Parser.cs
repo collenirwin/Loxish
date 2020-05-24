@@ -138,6 +138,11 @@ namespace Lang.Interpreter
                 return WhileStatement();
             }
 
+            if (NextTokenMatches(TokenType.For))
+            {
+                return ForStatement();
+            }
+
             if (NextTokenMatches(TokenType.Print))
             {
                 return PrintStatement();
@@ -174,7 +179,7 @@ namespace Lang.Interpreter
         /// <summary>
         /// Consumes a while statement.
         /// </summary>
-        private StatementBase WhileStatement()
+        private WhileStatement WhileStatement()
         {
             Consume(TokenType.LeftParen, "Expected '(' after 'while'.");
             var condition = Expression();
@@ -182,6 +187,63 @@ namespace Lang.Interpreter
 
             var body = Statement();
             return new WhileStatement(condition, body);
+        }
+
+        private StatementBase ForStatement()
+        {
+            Consume(TokenType.LeftParen, "Expected '(' after 'for'.");
+
+            StatementBase initializer = null;
+            if (!NextTokenMatches(TokenType.SemiColon))
+            {
+                initializer = NextTokenMatches(TokenType.Var)
+                    ? VarDeclaration()
+                    : ExpressionStatement();
+            }
+
+            ExpressionBase condition = null;
+            if (!PeekMatches(TokenType.SemiColon))
+            {
+                condition = Expression();
+            }
+
+            Consume(TokenType.SemiColon, "Expected ';' after for loop condition.");
+
+            ExpressionBase increment = null;
+            if (!PeekMatches(TokenType.RightParen))
+            {
+                increment = Expression();
+            }
+
+            Consume(TokenType.RightParen, "Expected ')' after for loop clauses.");
+
+            var body = Statement();
+
+            if (increment != null)
+            {
+                // wrap the body in a block with the increment executing at the end
+                body = new BlockStatement(new List<StatementBase>
+                {
+                    body,
+                    new ExpressionStatement(increment)
+                });
+            }
+
+            // wire up a while loop using the condition and body
+            condition ??= new LiteralExpression(true);
+            body = new WhileStatement(condition, body);
+
+            if (initializer != null)
+            {
+                // wrap the body in another block with the increment executing first
+                body = new BlockStatement(new List<StatementBase>
+                {
+                    initializer,
+                    body
+                });
+            }
+
+            return body;
         }
 
         /// <summary>
