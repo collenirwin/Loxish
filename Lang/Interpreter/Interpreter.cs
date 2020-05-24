@@ -381,6 +381,21 @@ namespace Lang.Interpreter
             _environment.Define(statement.Name.WrappedSource, function);
         }
 
+        /// <summary>
+        /// Runs a return statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitReturnStatement(ReturnStatement statement)
+        {
+            object value = null;
+            if (statement.Value != null)
+            {
+                value = Evaluate(statement.Value);
+            }
+
+            throw new ReturnException(value);
+        }
+
         #endregion
 
         #region Helpers

@@ -135,4 +135,21 @@ namespace Lang.Interpreter
             visitor.VisitFunctionStatement(this);
         }
     }
+
+    public class ReturnStatement : StatementBase
+    {
+        public Token Keyword { get; }
+        public ExpressionBase Value { get; }
+
+        public ReturnStatement(Token keyword, ExpressionBase value)
+        {
+            Keyword = keyword;
+            Value = value;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitReturnStatement(this);
+        }
+    }
 }

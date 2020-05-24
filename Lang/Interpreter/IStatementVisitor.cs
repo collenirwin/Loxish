@@ -13,5 +13,6 @@
         void VisitWhileStatement(WhileStatement statement);
         void VisitBreakStatement(BreakStatement statement);
         void VisitFunctionStatement(FunctionStatement statement);
+        void VisitReturnStatement(ReturnStatement statement);
     }
 }

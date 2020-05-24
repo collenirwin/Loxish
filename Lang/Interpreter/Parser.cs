@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace Lang.Interpreter
 {
@@ -178,6 +177,11 @@ namespace Lang.Interpreter
                 return ForStatement();
             }
 
+            if (NextTokenMatches(TokenType.Return))
+            {
+                return ReturnStatement();
+            }
+
             if (NextTokenMatches(TokenType.Break))
             {
                 return BreakStatement();
@@ -306,9 +310,26 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
+        /// Consumes a return statement.
+        /// </summary>
+        private ReturnStatement ReturnStatement()
+        {
+            var keyword = _currentToken;
+            ExpressionBase value = null;
+
+            if (!NextTokenMatches(TokenType.SemiColon))
+            {
+                value = Expression();
+            }
+
+            Consume(TokenType.SemiColon, "Expected ';' after return value.");
+            return new ReturnStatement(keyword, value);
+        }
+
+        /// <summary>
         /// Consumes a break statement.
         /// </summary>
-        private StatementBase BreakStatement()
+        private BreakStatement BreakStatement()
         {
             if (_loopDepth == 0)
             {

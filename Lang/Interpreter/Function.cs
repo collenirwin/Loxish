@@ -50,8 +50,16 @@ namespace Lang.Interpreter
                 environment.Define(item.Name, item.Value);
             }
 
-            // execute the function body with the new scope we just created
-            interpreter.ExecuteBlock(_declaration.Body, environment);
+            try
+            {
+                // execute the function body with the new scope we just created
+                interpreter.ExecuteBlock(_declaration.Body, environment);
+            }
+            catch (ReturnException ex)
+            {
+                return ex.Value;
+            }
+            
             return null;
         }
 
