@@ -21,7 +21,7 @@ namespace Lang.Interpreter
         /// Interprets and executes the given statements.
         /// </summary>
         /// <param name="statements">Statements to execute.</param>
-        public void Interpret(List<StatementBase> statements)
+        public void Interpret(IEnumerable<StatementBase> statements)
         {
             RuntimeExceptionThrown = false;
 
@@ -53,7 +53,7 @@ namespace Lang.Interpreter
         /// </summary>
         /// <param name="statements">Statements to execute.</param>
         /// <param name="environment">The block's environment.</param>
-        private void ExecuteBlock(List<StatementBase> statements, EnvironmentState environment)
+        private void ExecuteBlock(IEnumerable<StatementBase> statements, EnvironmentState environment)
         {
             // hang on to the current scope
             var outerEnvironment = _environment;

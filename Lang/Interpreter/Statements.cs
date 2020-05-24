@@ -59,9 +59,9 @@ namespace Lang.Interpreter
 
     public class BlockStatement : StatementBase
     {
-        public List<StatementBase> Statements { get; }
+        public IEnumerable<StatementBase> Statements { get; }
 
-        public BlockStatement(List<StatementBase> statements)
+        public BlockStatement(IEnumerable<StatementBase> statements)
         {
             Statements = statements;
         }

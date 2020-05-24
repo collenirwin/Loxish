@@ -54,7 +54,7 @@ namespace Lang.Interpreter
         /// Creates tokens from source code.
         /// </summary>
         /// <returns>All tokens generated from the source code.</returns>
-        public List<Token> Tokenize()
+        public IEnumerable<Token> Tokenize()
         {
             while (!_atEndOfSource)
             {

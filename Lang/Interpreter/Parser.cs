@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lang.Interpreter
 {
@@ -24,9 +25,9 @@ namespace Lang.Interpreter
         /// </summary>
         /// <param name="tokens">Tokens to parse.</param>
         /// <param name="errorState">Error state object to record detected errors.</param>
-        public Parser(List<Token> tokens, ErrorState errorState)
+        public Parser(IEnumerable<Token> tokens, ErrorState errorState)
         {
-            _tokens = tokens;
+            _tokens = tokens.ToList();
             ErrorState = errorState;
         }
 
@@ -34,7 +35,7 @@ namespace Lang.Interpreter
         /// Creates statements from tokens.
         /// </summary>
         /// <returns>All statements generated from the tokens.</returns>
-        public List<StatementBase> Parse()
+        public IEnumerable<StatementBase> Parse()
         {
             var statements = new List<StatementBase>();
 
@@ -222,7 +223,7 @@ namespace Lang.Interpreter
             if (increment != null)
             {
                 // wrap the body in a block with the increment executing at the end
-                body = new BlockStatement(new List<StatementBase>
+                body = new BlockStatement(new[]
                 {
                     body,
                     new ExpressionStatement(increment)
@@ -236,7 +237,7 @@ namespace Lang.Interpreter
             if (initializer != null)
             {
                 // wrap the body in another block with the increment executing first
-                body = new BlockStatement(new List<StatementBase>
+                body = new BlockStatement(new[]
                 {
                     initializer,
                     body
@@ -259,7 +260,7 @@ namespace Lang.Interpreter
         /// <summary>
         /// Consumes a block.
         /// </summary>
-        private List<StatementBase> BlockStatement()
+        private IEnumerable<StatementBase> BlockStatement()
         {
             var statements = new List<StatementBase>();
 
