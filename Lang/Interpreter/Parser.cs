@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace Lang.Interpreter
 {
@@ -97,6 +98,11 @@ namespace Lang.Interpreter
                     return VarDeclaration();
                 }
 
+                if (NextTokenMatches(TokenType.Fun))
+                {
+                    return Function(kind: "function");
+                }    
+
                 return Statement();
             }
             catch (ParserException)
@@ -121,6 +127,33 @@ namespace Lang.Interpreter
 
             Consume(TokenType.SemiColon, "Expected ';' after variable declaration.");
             return new VarStatement(name, initializer);
+        }
+
+        /// <summary>
+        /// Consumes a function declaration statement.
+        /// </summary>
+        private StatementBase Function(string kind)
+        {
+            var name = Consume(TokenType.Identifier, $"Expected {kind} name.");
+            Consume(TokenType.LeftParen, $"Expected '(' after {kind} name.");
+            var @params = new List<Token>();
+
+            if (!PeekMatches(TokenType.RightParen)) // no params?
+            {
+                do // at least one param
+                {
+                    if (@params.Count > 255)
+                    {
+                        Error(Peek(), "Cannot have more than 255 parameters.");
+                    }
+
+                    @params.Add(Consume(TokenType.Identifier, "Expected parameter name."));
+                } while (NextTokenMatches(TokenType.Comma)); // more params?
+            }
+
+            Consume(TokenType.RightParen, "Expected ')' after parameters.");
+            Consume(TokenType.LeftCurlyBrace, $"Expected '{{' before {kind} body.");
+            return new FunctionStatement(name, @params, body: BlockStatement());
         }
 
         /// <summary>

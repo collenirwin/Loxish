@@ -115,4 +115,24 @@ namespace Lang.Interpreter
             visitor.VisitBreakStatement(this);
         }
     }
+
+    public class FunctionStatement : StatementBase
+    {
+        public Token Name { get; }
+        public IEnumerable<Token> Params { get; }
+        public IEnumerable<StatementBase> Body { get; }
+
+        public FunctionStatement(Token name,
+            IEnumerable<Token> @params, IEnumerable<StatementBase> body)
+        {
+            Name = name;
+            Params = @params;
+            Body = body;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitFunctionStatement(this);
+        }
+    }
 }

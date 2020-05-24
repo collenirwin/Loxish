@@ -30,7 +30,14 @@ namespace Lang.Interpreter
         /// <param name="value">Value of the variable.</param>
         public void Define(string name, object value)
         {
-            _values.Add(name, value);
+            if (_values.ContainsKey(name))
+            {
+                _values[name] = value;
+            }
+            else
+            {
+                _values.Add(name, value);
+            }
         }
 
         /// <summary>

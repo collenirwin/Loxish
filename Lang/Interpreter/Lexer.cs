@@ -18,6 +18,7 @@ namespace Lang.Interpreter
             { "this",   TokenType.This },
             { "super",  TokenType.Super },
             { "var",    TokenType.Var },
+            { "fun",    TokenType.Fun },
             { "return", TokenType.Return },
             { "for",    TokenType.For },
             { "while",  TokenType.While },

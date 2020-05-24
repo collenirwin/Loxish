@@ -12,5 +12,6 @@
         void VisitIfStatement(IfStatement statement);
         void VisitWhileStatement(WhileStatement statement);
         void VisitBreakStatement(BreakStatement statement);
+        void VisitFunctionStatement(FunctionStatement statement);
     }
 }

@@ -10,8 +10,12 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
-        private readonly EnvironmentState _globalScope = new EnvironmentState();
         private EnvironmentState _environment;
+
+        /// <summary>
+        /// The outermost <see cref="EnvironmentState"/> of the interpreter.
+        /// </summary>
+        public EnvironmentState GlobalState { get; } = new EnvironmentState();
 
         /// <summary>
         /// Has a <see cref="RuntimeException"/> been thrown?
@@ -27,7 +31,7 @@ namespace Lang.Interpreter
         public void Interpret(IEnumerable<StatementBase> statements)
         {
             RuntimeExceptionThrown = false;
-            _environment = _globalScope;
+            _environment = GlobalState;
             PrepareGlobalScope();
 
             try
@@ -58,7 +62,7 @@ namespace Lang.Interpreter
         /// </summary>
         /// <param name="statements">Statements to execute.</param>
         /// <param name="environment">The block's environment.</param>
-        private void ExecuteBlock(IEnumerable<StatementBase> statements, EnvironmentState environment)
+        public void ExecuteBlock(IEnumerable<StatementBase> statements, EnvironmentState environment)
         {
             // hang on to the current scope
             var outerEnvironment = _environment;
@@ -367,6 +371,16 @@ namespace Lang.Interpreter
             throw new BreakException();
         }
 
+        /// <summary>
+        /// Runs a function declaration statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitFunctionStatement(FunctionStatement statement)
+        {
+            var function = new Function(statement);
+            _environment.Define(statement.Name.WrappedSource, function);
+        }
+
         #endregion
 
         #region Helpers
@@ -487,11 +501,14 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
-        /// Adds all native functions to the <see cref="_globalScope"/>.
+        /// Adds all native functions to the <see cref="GlobalState"/>.
         /// </summary>
         private void PrepareGlobalScope()
         {
-            _globalScope.Define("__SysClockSeconds", new SysClockSeconds());
+            foreach (var nativeFunction in NativeFunctionInstances.All)
+            {
+                GlobalState.Define(nativeFunction.Name, nativeFunction);
+            }
         }
 
         #endregion
