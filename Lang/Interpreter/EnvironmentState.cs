@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Lang.Interpreter
 {
@@ -64,6 +66,18 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
+        /// Assigns a value to an existing variable.
+        /// </summary>
+        /// <param name="name">The variable name token.</param>
+        /// <param name="value">Value of the variable.</param>
+        /// <param name="distance">Scope depth difference.</param>
+        /// <exception cref="RuntimeException"/>
+        public void Assign(Token name, object value, int distance)
+        {
+            GetAncestor(distance)._values[name.WrappedSource] = value;
+        }
+
+        /// <summary>
         /// Gets the value the corresponds with the name token.
         /// </summary>
         /// <param name="name">The variable name token.</param>
@@ -84,6 +98,35 @@ namespace Lang.Interpreter
             }
 
             throw new RuntimeException(name, $"'{name.WrappedSource}' is undefined.");
+        }
+
+        /// <summary>
+        /// Gets the value the corresponds with the name token at the given distance.
+        /// </summary>
+        /// <param name="name">The variable name token.</param>
+        /// <param name="distance">Scope depth difference.</param>
+        /// <exception cref="RuntimeException"/>
+        /// <returns>The value the corresponds with the name token.</returns>
+        public object GetValue(Token name, int distance)
+        {
+            return GetAncestor(distance)._values[name.WrappedSource];
+        }
+
+        /// <summary>
+        /// Gets an outer environment distance relatives away.
+        /// </summary>
+        /// <param name="distance">Distance the ancestor is away from this.</param>
+        /// <returns>The ancestor at the given distance.</returns>
+        private EnvironmentState GetAncestor(int distance)
+        {
+            var current = this;
+
+            for (int depth = 0; depth < distance; depth++)
+            {
+                current = current.OuterEnvironment;
+            }
+
+            return current;
         }
     }
 }

@@ -59,6 +59,15 @@ namespace Lang
                 return 2;
             }
 
+            var resolver = new Resolver(_interpreter, errorState);
+            resolver.Resolve(statements);
+
+            if (errorState.HasErrors)
+            {
+                ErrorReporter.ReportSyntaxErrors(errorState);
+                return 2;
+            }
+
             _interpreter.Interpret(statements);
             return _interpreter.RuntimeExceptionThrown ? 3 : 1;
         }

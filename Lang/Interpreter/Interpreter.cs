@@ -10,6 +10,7 @@ namespace Lang.Interpreter
     /// </summary>
     public class Interpreter : IExpressionVisitor<object>, IStatementVisitor
     {
+        private readonly Dictionary<ExpressionBase, int> _locals = new Dictionary<ExpressionBase, int>();
         private EnvironmentState _environment;
 
         /// <summary>
@@ -93,6 +94,16 @@ namespace Lang.Interpreter
         private object Evaluate(ExpressionBase expression)
         {
             return expression.Accept(this);
+        }
+
+        /// <summary>
+        /// Registers a local variable at a given scope depth.
+        /// </summary>
+        /// <param name="expression">Variable expression.</param>
+        /// <param name="depth">Scope depth.</param>
+        public void Resolve(ExpressionBase expression, int depth)
+        {
+            _locals.Add(expression, depth);
         }
 
         #endregion
@@ -202,7 +213,7 @@ namespace Lang.Interpreter
         /// <returns>The result of the expression.</returns>
         public object VisitVariableExpression(VariableExpression expression)
         {
-            return _environment.GetValue(expression.Name);
+            return GetVariableValue(expression.Name, expression);
         }
 
         /// <summary>
@@ -534,6 +545,22 @@ namespace Lang.Interpreter
             {
                 GlobalState.Define(nativeFunction.Name, nativeFunction);
             }
+        }
+
+        /// <summary>
+        /// Resolves a variable's value.
+        /// </summary>
+        /// <param name="name">Variable's name token.</param>
+        /// <param name="expression">Variable expression.</param>
+        /// <returns>The variable's value.</returns>
+        private object GetVariableValue(Token name, ExpressionBase expression)
+        {
+            if (_locals.TryGetValue(expression, out int distance))
+            {
+                return _environment.GetValue(name, distance);
+            }
+
+            return GlobalState.GetValue(name);
         }
 
         #endregion
