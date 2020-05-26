@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Lang.Interpreter
 {
+    /// <summary>
+    /// Walks the AST, resolving variable scope.
+    /// </summary>
     public class Resolver : IExpressionVisitor<object>, IStatementVisitor
     {
         private readonly Interpreter _interpreter;
         private readonly Stack<Dictionary<string, bool>> _scopes = new Stack<Dictionary<string, bool>>();
+        private FunctionType _currentFunctionType = FunctionType.None;
 
         public ErrorState ErrorState { get; }
 
@@ -47,7 +50,7 @@ namespace Lang.Interpreter
 
         public object VisitFunctionExpression(FunctionExpression expression)
         {
-            ResolveFunction(expression);
+            ResolveFunction(expression, FunctionType.Function);
             return null;
         }
 
@@ -109,7 +112,7 @@ namespace Lang.Interpreter
         {
             Declare(statement.Name);
             Define(statement.Name);
-            ResolveFunction(statement.Function);
+            ResolveFunction(statement.Function, FunctionType.Function);
         }
 
         public void VisitVarStatement(VarStatement statement)
@@ -139,6 +142,11 @@ namespace Lang.Interpreter
 
         public void VisitReturnStatement(ReturnStatement statement)
         {
+            if (_currentFunctionType == FunctionType.None)
+            {
+                ErrorState.AddError(statement.Keyword, "Cannot return from top-level code.");
+            }
+
             statement.Value?.Accept(this);
         }
 
@@ -165,8 +173,10 @@ namespace Lang.Interpreter
                 }
             }
         }
-        private void ResolveFunction(FunctionExpression function)
+        private void ResolveFunction(FunctionExpression function, FunctionType type)
         {
+            var enclosingFunctionType = _currentFunctionType;
+            _currentFunctionType = type;
             BeginScope();
 
             foreach (var param in function.Params)
@@ -177,6 +187,7 @@ namespace Lang.Interpreter
 
             Resolve(function.Body);
             EndScope();
+            _currentFunctionType = enclosingFunctionType;
         }
 
 
@@ -207,5 +218,14 @@ namespace Lang.Interpreter
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Defines the available types of functions.
+    /// </summary>
+    enum FunctionType
+    {
+        None,
+        Function
     }
 }
