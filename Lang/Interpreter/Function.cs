@@ -9,6 +9,7 @@ namespace Lang.Interpreter
     public class Function : ICallable
     {
         private readonly FunctionStatement _declaration;
+        private readonly EnvironmentState _closure;
 
         /// <summary>
         /// The number of arguments this function requires.
@@ -20,9 +21,10 @@ namespace Lang.Interpreter
         /// <see cref="FunctionStatement"/> declaration it originated from.
         /// </summary>
         /// <param name="declaration">Parsed source of the function.</param>
-        public Function(FunctionStatement declaration)
+        public Function(FunctionStatement declaration, EnvironmentState closure)
         {
             _declaration = declaration;
+            _closure = closure;
             ArgumentCount = _declaration.Params.Count();
         }
 
@@ -35,7 +37,7 @@ namespace Lang.Interpreter
         public object Call(Interpreter interpreter, IEnumerable<object> arguments)
         {
             // each call gets its own scope so that it can keep track of its individual state
-            var environment = new EnvironmentState(outerEnvironment: interpreter.GlobalState);
+            var environment = new EnvironmentState(outerEnvironment: _closure);
 
             // combine the params and the arguments into one collection
             var paramArguments = _declaration.Params.Zip(arguments, (param, argument) => new

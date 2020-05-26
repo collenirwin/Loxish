@@ -377,7 +377,7 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitFunctionStatement(FunctionStatement statement)
         {
-            var function = new Function(statement);
+            var function = new Function(statement, _environment);
             _environment.Define(statement.Name.WrappedSource, function);
         }
 
