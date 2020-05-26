@@ -160,4 +160,21 @@ namespace Lang.Interpreter
             return visitor.VisitCallExpression(this);
         }
     }
+
+    public class FunctionExpression : ExpressionBase
+    {
+        public IEnumerable<Token> Params { get; }
+        public IEnumerable<StatementBase> Body { get; }
+
+        public FunctionExpression(IEnumerable<Token> @params, IEnumerable<StatementBase> body)
+        {
+            Params = @params;
+            Body = body;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitFunctionExpression(this);
+        }
+    }
 }

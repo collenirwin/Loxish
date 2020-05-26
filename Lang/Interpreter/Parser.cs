@@ -97,8 +97,9 @@ namespace Lang.Interpreter
                     return VarDeclaration();
                 }
 
-                if (NextTokenMatches(TokenType.Fun))
+                if (PeekMatches(TokenType.Fun) && PeekAfterMatches(TokenType.Identifier))
                 {
+                    NextToken();
                     return Function(kind: "function");
                 }    
 
@@ -131,28 +132,10 @@ namespace Lang.Interpreter
         /// <summary>
         /// Consumes a function declaration statement.
         /// </summary>
-        private StatementBase Function(string kind)
+        private FunctionStatement Function(string kind)
         {
             var name = Consume(TokenType.Identifier, $"Expected {kind} name.");
-            Consume(TokenType.LeftParen, $"Expected '(' after {kind} name.");
-            var @params = new List<Token>();
-
-            if (!PeekMatches(TokenType.RightParen)) // no params?
-            {
-                do // at least one param
-                {
-                    if (@params.Count > 255)
-                    {
-                        Error(Peek(), "Cannot have more than 255 parameters.");
-                    }
-
-                    @params.Add(Consume(TokenType.Identifier, "Expected parameter name."));
-                } while (NextTokenMatches(TokenType.Comma)); // more params?
-            }
-
-            Consume(TokenType.RightParen, "Expected ')' after parameters.");
-            Consume(TokenType.LeftCurlyBrace, $"Expected '{{' before {kind} body.");
-            return new FunctionStatement(name, @params, body: BlockStatement());
+            return new FunctionStatement(name, FunctionBody(kind));
         }
 
         /// <summary>
@@ -584,6 +567,11 @@ namespace Lang.Interpreter
                 return new VariableExpression(_currentToken);
             }
 
+            if (NextTokenMatches(TokenType.Fun))
+            {
+                return FunctionBody(kind: "anonymous function");
+            }
+
             if (NextTokenMatches(TokenType.LeftParen))
             {
                 NextToken();
@@ -593,6 +581,31 @@ namespace Lang.Interpreter
             }
 
             throw Error(Peek(), "Expression expected.");
+        }
+
+        private FunctionExpression FunctionBody(string kind)
+        {
+            Consume(TokenType.LeftParen, kind == "anonymous function"
+                ? $"Expected '(' after {kind} declaration."
+                : $"Expected '(' after {kind} name.");
+            var @params = new List<Token>();
+
+            if (!PeekMatches(TokenType.RightParen)) // no params?
+            {
+                do // at least one param
+                {
+                    if (@params.Count > 255)
+                    {
+                        Error(Peek(), "Cannot have more than 255 parameters.");
+                    }
+
+                    @params.Add(Consume(TokenType.Identifier, "Expected parameter name."));
+                } while (NextTokenMatches(TokenType.Comma)); // more params?
+            }
+
+            Consume(TokenType.RightParen, "Expected ')' after parameters.");
+            Consume(TokenType.LeftCurlyBrace, $"Expected '{{' before {kind} body.");
+            return new FunctionExpression(@params, body: BlockStatement());
         }
 
         #endregion
@@ -645,6 +658,13 @@ namespace Lang.Interpreter
         /// <param name="tokenType">Token type to match.</param>
         /// <returns>True if the next token matches the passed token type</returns>
         private bool PeekMatches(TokenType tokenType) => !_atEndOfTokens && Peek().Type == tokenType;
+
+        /// <summary>
+        /// Checks to see if the token after the next token matches the passed token type.
+        /// </summary>
+        /// <param name="tokenType">Token type to match.</param>
+        /// <returns>True if the token after next token matches the passed token type</returns>
+        private bool PeekAfterMatches(TokenType tokenType) => !_atEndOfTokens && _tokens[_current + 1].Type == tokenType;
 
         /// <summary>
         /// Consumes the next token if it is of the passed type.

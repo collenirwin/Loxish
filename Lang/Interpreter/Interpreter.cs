@@ -283,6 +283,16 @@ namespace Lang.Interpreter
             return function.Call(this, argumentValues);
         }
 
+        /// <summary>
+        /// Evaluates a function expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitFunctionExpression(FunctionExpression expression)
+        {
+            return new Function(expression, _environment);
+        }
+
         #endregion
 
         #region Statement visitation
@@ -377,7 +387,7 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitFunctionStatement(FunctionStatement statement)
         {
-            var function = new Function(statement, _environment);
+            var function = new Function(statement.Function, _environment, statement.Name);
             _environment.Define(statement.Name.WrappedSource, function);
         }
 

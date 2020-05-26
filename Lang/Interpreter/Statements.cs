@@ -119,15 +119,12 @@ namespace Lang.Interpreter
     public class FunctionStatement : StatementBase
     {
         public Token Name { get; }
-        public IEnumerable<Token> Params { get; }
-        public IEnumerable<StatementBase> Body { get; }
+        public FunctionExpression Function { get; }
 
-        public FunctionStatement(Token name,
-            IEnumerable<Token> @params, IEnumerable<StatementBase> body)
+        public FunctionStatement(Token name, FunctionExpression function)
         {
             Name = name;
-            Params = @params;
-            Body = body;
+            Function = function;
         }
 
         public override void Accept(IStatementVisitor visitor)

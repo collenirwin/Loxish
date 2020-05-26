@@ -8,7 +8,8 @@ namespace Lang.Interpreter
     /// </summary>
     public class Function : ICallable
     {
-        private readonly FunctionStatement _declaration;
+        private readonly Token _name;
+        private readonly FunctionExpression _declaration;
         private readonly EnvironmentState _closure;
 
         /// <summary>
@@ -21,10 +22,11 @@ namespace Lang.Interpreter
         /// <see cref="FunctionStatement"/> declaration it originated from.
         /// </summary>
         /// <param name="declaration">Parsed source of the function.</param>
-        public Function(FunctionStatement declaration, EnvironmentState closure)
+        public Function(FunctionExpression declaration, EnvironmentState closure, Token name = null)
         {
             _declaration = declaration;
             _closure = closure;
+            _name = name;
             ArgumentCount = _declaration.Params.Count();
         }
 
@@ -67,7 +69,7 @@ namespace Lang.Interpreter
 
         public override string ToString()
         {
-            return $"<fun {_declaration.Name.WrappedSource}>";
+            return $"<fun {_name?.WrappedSource ?? "<anonymous>"}>";
         }
     }
 }

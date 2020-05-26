@@ -14,5 +14,6 @@
         T VisitAssignmentExpression(AssignmentExpression expression);
         T VisitLogicalExpression(LogicalExpression expression);
         T VisitCallExpression(CallExpression expression);
+        T VisitFunctionExpression(FunctionExpression expression);
     }
 }

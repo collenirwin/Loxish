@@ -32,6 +32,11 @@ namespace Lang.Interpreter
             throw new System.NotImplementedException();
         }
 
+        public string VisitFunctionExpression(FunctionExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitGroupingExpression(GroupingExpression expression)
         {
             return Parenthesize("group", expression.Expression);
