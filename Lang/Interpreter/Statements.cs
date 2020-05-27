@@ -149,4 +149,21 @@ namespace Lang.Interpreter
             visitor.VisitReturnStatement(this);
         }
     }
+
+    public class ClassStatement : StatementBase
+    {
+        public Token Name { get; }
+        public IEnumerable<FunctionStatement> Methods { get; }
+
+        public ClassStatement(Token name, IEnumerable<FunctionStatement> methods)
+        {
+            Name = name;
+            Methods = methods;
+        }
+
+        public override void Accept(IStatementVisitor visitor)
+        {
+            visitor.VisitClassStatement(this);
+        }
+    }
 }

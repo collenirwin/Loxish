@@ -7,7 +7,7 @@ namespace Lang.Interpreter
     /// </summary>
     public interface ICallable
     {
-        int ArgumentCount { get; }
+        int ParamCount { get; }
         object Call(Interpreter interpreter, IEnumerable<object> arguments);
     }
 }

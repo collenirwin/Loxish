@@ -150,6 +150,12 @@ namespace Lang.Interpreter
             statement.Value?.Accept(this);
         }
 
+        public void VisitClassStatement(ClassStatement statement)
+        {
+            Declare(statement.Name);
+            Define(statement.Name);
+        }
+
         #endregion
 
         #region Helpers

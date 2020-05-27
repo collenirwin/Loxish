@@ -14,5 +14,6 @@
         void VisitBreakStatement(BreakStatement statement);
         void VisitFunctionStatement(FunctionStatement statement);
         void VisitReturnStatement(ReturnStatement statement);
+        void VisitClassStatement(ClassStatement statement);
     }
 }

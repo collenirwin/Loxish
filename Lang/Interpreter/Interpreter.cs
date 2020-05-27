@@ -285,10 +285,10 @@ namespace Lang.Interpreter
                 throw new RuntimeException(expression.ClosingParen, "Expression does not support calling.");
             }
 
-            if (function.ArgumentCount != argumentValues.Count)
+            if (function.ParamCount != argumentValues.Count)
             {
                 throw new RuntimeException(expression.ClosingParen,
-                    $"Expected {function.ArgumentCount} arguments but got {argumentValues.Count}.");
+                    $"Expected {function.ParamCount} arguments but got {argumentValues.Count}.");
             }
 
             return function.Call(this, argumentValues);
@@ -415,6 +415,17 @@ namespace Lang.Interpreter
             }
 
             throw new ReturnException(value);
+        }
+
+        /// <summary>
+        /// Runs a class statement.
+        /// </summary>
+        /// <param name="statement">Statement to run.</param>
+        public void VisitClassStatement(ClassStatement statement)
+        {
+            _environment.Define(statement.Name.WrappedSource, null);
+            var @class = new Class(statement.Name.WrappedSource);
+            _environment.Assign(statement.Name, @class);
         }
 
         #endregion

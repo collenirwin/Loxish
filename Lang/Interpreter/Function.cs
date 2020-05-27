@@ -15,7 +15,7 @@ namespace Lang.Interpreter
         /// <summary>
         /// The number of arguments this function requires.
         /// </summary>
-        public int ArgumentCount { get; }
+        public int ParamCount { get; }
 
         /// <summary>
         /// Initialize a <see cref="Function"/> with the
@@ -27,7 +27,7 @@ namespace Lang.Interpreter
             _declaration = declaration;
             _closure = closure;
             _name = name;
-            ArgumentCount = _declaration.Params.Count();
+            ParamCount = _declaration.Params.Count();
         }
 
         /// <summary>

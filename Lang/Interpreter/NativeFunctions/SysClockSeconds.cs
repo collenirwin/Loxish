@@ -9,7 +9,7 @@ namespace Lang.Interpreter.NativeFunctions
     public class SysClockSeconds : NativeFunctionBase, ICallable
     {
         public override string Name { get; } = "__SysClockSeconds";
-        public int ArgumentCount { get; } = 0;
+        public int ParamCount { get; } = 0;
 
         public object Call(Interpreter interpreter, IEnumerable<object> arguments)
         {

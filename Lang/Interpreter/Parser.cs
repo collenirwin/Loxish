@@ -97,6 +97,11 @@ namespace Lang.Interpreter
                     return VarDeclaration();
                 }
 
+                if (NextTokenMatches(TokenType.Class))
+                {
+                    return ClassDeclaration();
+                }
+
                 if (PeekMatches(TokenType.Fun) && PeekAfterMatches(TokenType.Identifier))
                 {
                     NextToken();
@@ -127,6 +132,24 @@ namespace Lang.Interpreter
 
             Consume(TokenType.SemiColon, "Expected ';' after variable declaration.");
             return new VarStatement(name, initializer);
+        }
+
+        /// <summary>
+        /// Consumes a class declaration statement.
+        /// </summary>
+        private ClassStatement ClassDeclaration()
+        {
+            var name = Consume(TokenType.Identifier, "Expected class name.");
+            Consume(TokenType.LeftCurlyBrace, "Expected '{' before class body.");
+
+            var methods = new List<FunctionStatement>();
+            while (!PeekMatches(TokenType.RightCurlyBrace) && !_atEndOfTokens)
+            {
+                methods.Add(Function(kind: "method"));
+            }
+
+            Consume(TokenType.RightCurlyBrace, "Expected '}' after class body.");
+            return new ClassStatement(name, methods);
         }
 
         /// <summary>
