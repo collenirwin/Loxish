@@ -177,4 +177,21 @@ namespace Lang.Interpreter
             return visitor.VisitFunctionExpression(this);
         }
     }
+
+    public class GetExpression : ExpressionBase
+    {
+        public ExpressionBase Object { get; }
+        public Token Name { get; }
+
+        public GetExpression(ExpressionBase @object, Token name)
+        {
+            Object = @object;
+            Name = name;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitGetExpression(this);
+        }
+    }
 }

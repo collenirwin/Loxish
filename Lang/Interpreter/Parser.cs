@@ -534,9 +534,21 @@ namespace Lang.Interpreter
         {
             var expression = Primary();
 
-            while (NextTokenMatches(TokenType.LeftParen))
+            while (true)
             {
-                expression = FinishCall(expression);
+                if (NextTokenMatches(TokenType.LeftParen))
+                {
+                    expression = FinishCall(expression);
+                }
+                else if (NextTokenMatches(TokenType.Dot))
+                {
+                    var name = Consume(TokenType.Identifier, "Expected identifier after '.'.");
+                    expression = new GetExpression(expression, name);
+                }
+                else
+                {
+                    break;
+                }
             }
 
             return expression;

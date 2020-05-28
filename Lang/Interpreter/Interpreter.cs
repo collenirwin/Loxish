@@ -304,6 +304,22 @@ namespace Lang.Interpreter
             return new Function(expression, _environment);
         }
 
+        /// <summary>
+        /// Evaluates a get (access) expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitGetExpression(GetExpression expression)
+        {
+            var @object = Evaluate(expression.Object);
+            if (@object is Instance instance)
+            {
+                return instance.Get(expression.Name);
+            }
+
+            throw new RuntimeException(expression.Name, "Only class instances have properties.");
+        }
+
         #endregion
 
         #region Statement visitation

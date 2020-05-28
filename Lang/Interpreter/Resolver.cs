@@ -88,6 +88,12 @@ namespace Lang.Interpreter
             return null;
         }
 
+        public object VisitGetExpression(GetExpression expression)
+        {
+            expression.Object.Accept(this);
+            return null;
+        }
+
         #endregion
 
         #region Statements
