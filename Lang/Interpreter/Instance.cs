@@ -33,7 +33,8 @@ namespace Lang.Interpreter
                 return value;
             }
 
-            throw new RuntimeException(name, $"Property '{name.WrappedSource}' is undefined.");
+            return _class.GetMethod(name.WrappedSource) ??
+                throw new RuntimeException(name, $"Property '{name.WrappedSource}' is undefined.");
         }
 
         /// <summary>

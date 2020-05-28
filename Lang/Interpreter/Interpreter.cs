@@ -458,7 +458,14 @@ namespace Lang.Interpreter
         public void VisitClassStatement(ClassStatement statement)
         {
             _environment.Define(statement.Name.WrappedSource, null);
-            var @class = new Class(statement.Name.WrappedSource);
+
+            var methods = new Dictionary<string, Function>();
+            foreach (var method in statement.Methods)
+            {
+                methods.Add(method.Name.WrappedSource, new Function(method.Function, _environment));
+            }
+
+            var @class = new Class(statement.Name.WrappedSource, methods);
             _environment.Assign(statement.Name, @class);
         }
 

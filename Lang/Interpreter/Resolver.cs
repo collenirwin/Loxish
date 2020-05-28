@@ -167,6 +167,11 @@ namespace Lang.Interpreter
         {
             Declare(statement.Name);
             Define(statement.Name);
+
+            foreach (var method in statement.Methods)
+            {
+                ResolveFunction(method.Function, FunctionType.Method);
+            }
         }
 
         #endregion
@@ -245,6 +250,7 @@ namespace Lang.Interpreter
     enum FunctionType
     {
         None,
-        Function
+        Function,
+        Method
     }
 }
