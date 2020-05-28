@@ -36,6 +36,23 @@ namespace Lang.Interpreter
             throw new RuntimeException(name, $"Property '{name.WrappedSource}' is undefined.");
         }
 
+        /// <summary>
+        /// Sets the value of an instance property by its name, creating it if it does not yet exist.
+        /// </summary>
+        /// <param name="name">Name of the property.</param>
+        /// <param name="value">Value to assign to the property.</param>
+        public void Set(Token name, object value)
+        {
+            if (_properties.ContainsKey(name.WrappedSource))
+            {
+                _properties[name.WrappedSource] = value;
+            }
+            else
+            {
+                _properties.Add(name.WrappedSource, value);
+            }
+        }
+
         public override string ToString()
         {
             return $"{_class.Name} instance";

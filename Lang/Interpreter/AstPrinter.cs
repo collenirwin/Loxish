@@ -37,6 +37,11 @@ namespace Lang.Interpreter
             throw new System.NotImplementedException();
         }
 
+        public string VisitGetExpression(GetExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitGroupingExpression(GroupingExpression expression)
         {
             return Parenthesize("group", expression.Expression);
@@ -48,6 +53,11 @@ namespace Lang.Interpreter
         }
 
         public string VisitLogicalExpression(LogicalExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public string VisitSetExpression(SetExpression expression)
         {
             throw new System.NotImplementedException();
         }

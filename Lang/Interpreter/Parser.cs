@@ -405,8 +405,12 @@ namespace Lang.Interpreter
 
                 if (expression is VariableExpression variableExpression)
                 {
-                    var name = variableExpression.Name;
-                    return new AssignmentExpression(name, @operator, value);
+                    return new AssignmentExpression(variableExpression.Name, @operator, value);
+                }
+
+                if (expression is GetExpression getExpression)
+                {
+                    return new SetExpression(getExpression.Object, getExpression.Name, value);
                 }
 
                 Error(@operator, "Invalid assignment target.");

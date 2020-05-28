@@ -16,5 +16,6 @@
         T VisitCallExpression(CallExpression expression);
         T VisitFunctionExpression(FunctionExpression expression);
         T VisitGetExpression(GetExpression expression);
+        T VisitSetExpression(SetExpression expression);
     }
 }

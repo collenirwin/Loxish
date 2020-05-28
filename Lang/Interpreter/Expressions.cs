@@ -194,4 +194,23 @@ namespace Lang.Interpreter
             return visitor.VisitGetExpression(this);
         }
     }
+
+    public class SetExpression : ExpressionBase
+    {
+        public ExpressionBase Object { get; }
+        public Token Name { get; }
+        public ExpressionBase Value { get; }
+
+        public SetExpression(ExpressionBase @object, Token name, ExpressionBase value)
+        {
+            Object = @object;
+            Name = name;
+            Value = value;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitSetExpression(this);
+        }
+    }
 }

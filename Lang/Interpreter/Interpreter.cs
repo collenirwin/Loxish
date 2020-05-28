@@ -320,6 +320,24 @@ namespace Lang.Interpreter
             throw new RuntimeException(expression.Name, "Only class instances have properties.");
         }
 
+        /// <summary>
+        /// Evaluates a set expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitSetExpression(SetExpression expression)
+        {
+            var @object = Evaluate(expression.Object);
+            if (@object is Instance instance)
+            {
+                var value = Evaluate(expression.Value);
+                instance.Set(expression.Name, value);
+                return value;
+            }
+
+            throw new RuntimeException(expression.Name, "Only class instances have properties.");
+        }
+
         #endregion
 
         #region Statement visitation

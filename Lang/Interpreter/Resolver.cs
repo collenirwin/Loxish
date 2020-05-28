@@ -94,6 +94,13 @@ namespace Lang.Interpreter
             return null;
         }
 
+        public object VisitSetExpression(SetExpression expression)
+        {
+            expression.Object.Accept(this);
+            expression.Value.Accept(this);
+            return null;
+        }
+
         #endregion
 
         #region Statements
