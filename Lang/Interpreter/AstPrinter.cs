@@ -62,6 +62,11 @@ namespace Lang.Interpreter
             throw new System.NotImplementedException();
         }
 
+        public string VisitSingleLineFunctionExpression(SingleLineFunctionExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitUnaryExpression(UnaryExpression expression)
         {
             return Parenthesize(expression.Operator.WrappedSource, expression.Operand);

@@ -178,6 +178,19 @@ namespace Lang.Interpreter
         }
     }
 
+    public class SingleLineFunctionExpression : FunctionExpression
+    {
+        public SingleLineFunctionExpression(IEnumerable<Token> @params, StatementBase body)
+            : base(@params, new[] { body })
+        {
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitSingleLineFunctionExpression(this);
+        }
+    }
+
     public class GetExpression : ExpressionBase
     {
         public ExpressionBase Object { get; }

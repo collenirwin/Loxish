@@ -117,7 +117,11 @@ namespace Lang.Interpreter
                     AddToken(NextCharIs('=') ? TokenType.BangEqual : TokenType.Bang);
                     break;
                 case '=':
-                    AddToken(NextCharIs('=') ? TokenType.DoubleEqual : TokenType.Equal);
+                    AddToken(NextCharIs('=')
+                        ? TokenType.DoubleEqual
+                        : NextCharIs('>')
+                            ? TokenType.Arrow
+                            : TokenType.Equal);
                     break;
                 case '<':
                     AddToken(NextCharIs('=') ? TokenType.LessThanOrEqual : TokenType.LessThan);

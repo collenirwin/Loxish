@@ -32,6 +32,7 @@
         Pipe,
         DoublePipe,
         Caret,
+        Arrow,
 
         // literals
         Identifier,

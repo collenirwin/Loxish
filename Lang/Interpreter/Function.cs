@@ -11,6 +11,7 @@ namespace Lang.Interpreter
         private readonly Token _name;
         private readonly FunctionExpression _declaration;
         private readonly EnvironmentState _closure;
+        private readonly bool _isSingleLine;
 
         /// <summary>
         /// The number of arguments this function requires.
@@ -22,11 +23,13 @@ namespace Lang.Interpreter
         /// <see cref="FunctionStatement"/> declaration it originated from.
         /// </summary>
         /// <param name="declaration">Parsed source of the function.</param>
-        public Function(FunctionExpression declaration, EnvironmentState closure, Token name = null)
+        public Function(FunctionExpression declaration, EnvironmentState closure,
+            Token name = null, bool isSingleLine = false)
         {
             _declaration = declaration;
             _closure = closure;
             _name = name;
+            _isSingleLine = isSingleLine;
             ParamCount = _declaration.Params.Count();
         }
 
@@ -56,6 +59,12 @@ namespace Lang.Interpreter
 
             try
             {
+                if (_isSingleLine)
+                {
+                    var expression = (_declaration.Body.First() as ExpressionStatement).Expression;
+                    return interpreter.EvaluateAsBlock(expression, environment);
+                }
+
                 // execute the function body with the new scope we just created
                 interpreter.ExecuteBlock(_declaration.Body, environment);
             }

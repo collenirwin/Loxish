@@ -86,6 +86,27 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
+        /// <see cref="Evaluate"/>s all the given expression in a scoped block.
+        /// </summary>
+        /// <param name="statements">Expression to evaluate.</param>
+        /// <param name="environment">The block's environment.</param>
+        /// <returns>The result of the expression evaluation.</returns>
+        public object EvaluateAsBlock(ExpressionBase expression, EnvironmentState environment)
+        {
+            var outerEnvironment = _environment;
+
+            try
+            {
+                _environment = environment;
+                return Evaluate(expression);
+            }
+            finally
+            {
+                _environment = outerEnvironment;
+            }
+        }
+
+        /// <summary>
         /// Runs the expression's <see cref="ExpressionBase.Accept{T}(IExpressionVisitor{T})"/> method.
         /// This will essentially compute the value of the expression and return it.
         /// </summary>
@@ -302,6 +323,16 @@ namespace Lang.Interpreter
         public object VisitFunctionExpression(FunctionExpression expression)
         {
             return new Function(expression, _environment);
+        }
+
+        /// <summary>
+        /// Evaluates a single-line function expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitSingleLineFunctionExpression(SingleLineFunctionExpression expression)
+        {
+            return new Function(expression, _environment, isSingleLine: true);
         }
 
         /// <summary>

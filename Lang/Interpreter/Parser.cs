@@ -145,7 +145,13 @@ namespace Lang.Interpreter
             var methods = new List<FunctionStatement>();
             while (!PeekMatches(TokenType.RightCurlyBrace) && !_atEndOfTokens)
             {
-                methods.Add(Function(kind: "method"));
+                var method = Function(kind: "method");
+                methods.Add(method);
+
+                if (method.Function is SingleLineFunctionExpression)
+                {
+                    Consume(TokenType.SemiColon, "Expected ';' after single-line method body.");
+                }
             }
 
             Consume(TokenType.RightCurlyBrace, "Expected '}' after class body.");
@@ -643,8 +649,18 @@ namespace Lang.Interpreter
             }
 
             Consume(TokenType.RightParen, "Expected ')' after parameters.");
-            Consume(TokenType.LeftCurlyBrace, $"Expected '{{' before {kind} body.");
-            return new FunctionExpression(@params, body: BlockStatement());
+
+            if (NextTokenMatches(TokenType.LeftCurlyBrace))
+            {
+                return new FunctionExpression(@params, body: BlockStatement());
+            }
+
+            if (NextTokenMatches(TokenType.Arrow))
+            {
+                return new SingleLineFunctionExpression(@params, body: new ExpressionStatement(Expression()));
+            }
+
+            throw Error(Peek(), $"Expected '{{' or '=>' after {kind} declaration.");
         }
 
         #endregion
@@ -711,6 +727,7 @@ namespace Lang.Interpreter
         /// </summary>
         /// <param name="tokenType">Token type to match.</param>
         /// <param name="errorMessage">Error message to display if the token type is not matched.</param>
+        /// <exception cref="ParserException"/>
         /// <returns>The consumed token.</returns>
         private Token Consume(TokenType tokenType, string errorMessage)
         {

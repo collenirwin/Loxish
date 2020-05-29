@@ -54,6 +54,12 @@ namespace Lang.Interpreter
             return null;
         }
 
+        public object VisitSingleLineFunctionExpression(SingleLineFunctionExpression expression)
+        {
+            ResolveFunction(expression, FunctionType.Function);
+            return null;
+        }
+
         public object VisitGroupingExpression(GroupingExpression expression)
         {
             expression.Expression.Accept(this);
