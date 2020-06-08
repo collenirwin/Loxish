@@ -362,6 +362,23 @@ namespace Lang.Interpreter
             return GetVariableValue(expression.Keyword, expression);
         }
 
+        /// <summary>
+        /// Evaluates a super expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitSuperExpression(SuperExpression expression)
+        {
+            int distance = _locals[expression];
+            var superClass = _environment.GetValue("super", distance) as Class;
+
+            // 'this' will always be 1 scope away from 'super'
+            var instance = _environment.GetValue("this", distance - 1) as Instance;
+            return superClass.TryGetMethod(expression.Method.WrappedSource)?.Bind(instance)
+                ?? throw new RuntimeException(expression.Method,
+                    $"Property '{expression.Method.WrappedSource}' is undefined.");
+        }
+
         #endregion
 
         #region Statement visitation
@@ -481,14 +498,18 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitClassStatement(ClassStatement statement)
         {
+            _environment.Define(statement.Name.WrappedSource, null);
+
             Class superClass = null;
             if (statement.SuperClass != null)
             {
                 superClass = Evaluate(statement.SuperClass) as Class ??
                     throw new RuntimeException(statement.SuperClass.Name, "Superclass must be a class.");
+
+                // create a new scope, adding a reference to the superclass via the 'super' keyword
+                _environment = new EnvironmentState(outerEnvironment: _environment);
+                _environment.Define("super", superClass);
             }
-            
-            _environment.Define(statement.Name.WrappedSource, null);
 
             var methods = new Dictionary<string, Function>();
             foreach (var method in statement.Methods)
@@ -499,6 +520,13 @@ namespace Lang.Interpreter
             }
 
             var @class = new Class(statement.Name.WrappedSource, methods, superClass);
+
+            // go back to the previous scope if we switched to a new one earlier
+            if (superClass != null)
+            {
+                _environment = _environment.OuterEnvironment;
+            }
+
             _environment.Assign(statement.Name, @class);
         }
 

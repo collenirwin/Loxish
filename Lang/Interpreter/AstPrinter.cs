@@ -62,6 +62,11 @@ namespace Lang.Interpreter
             throw new System.NotImplementedException();
         }
 
+        public string VisitSuperExpression(SuperExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public string VisitThisExpression(ThisExpression expression)
         {
             throw new System.NotImplementedException();

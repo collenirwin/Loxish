@@ -614,6 +614,14 @@ namespace Lang.Interpreter
                 return new ThisExpression(_currentToken);
             }
 
+            if (NextTokenMatches(TokenType.Super))
+            {
+                var keyword = _currentToken;
+                Consume(TokenType.Dot, "Expected '.' after 'super'.");
+                var method = Consume(TokenType.Identifier, "Expected superclass method name.");
+                return new SuperExpression(keyword, method);
+            }
+
             if (NextTokenMatches(TokenType.Identifier))
             {
                 return new VariableExpression(_currentToken);

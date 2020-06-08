@@ -116,6 +116,21 @@ namespace Lang.Interpreter
             return null;
         }
 
+        public object VisitSuperExpression(SuperExpression expression)
+        {
+            if (_currentClassType == ClassType.None)
+            {
+                ErrorState.AddError(expression.Keyword, "Cannot use 'super' outside of a class.");
+            }
+            else if (_currentClassType != ClassType.SubClass)
+            {
+                ErrorState.AddError(expression.Keyword, "Cannot use 'super' in a class with no superclass.");
+            }
+
+            ResolveLocal(expression, expression.Keyword);
+            return null;
+        }
+
         #endregion
 
         #region Statements
@@ -194,12 +209,19 @@ namespace Lang.Interpreter
             Declare(statement.Name);
             Define(statement.Name);
 
-            if (statement.Name.WrappedSource == statement.SuperClass?.Name.WrappedSource)
+            if (statement.SuperClass != null)
             {
-                ErrorState.AddError(statement.SuperClass.Name, "A class cannot derive from itself.");
-            }
+                if (statement.Name.WrappedSource == statement.SuperClass.Name.WrappedSource)
+                {
+                    ErrorState.AddError(statement.SuperClass.Name, "A class cannot derive from itself.");
+                }
 
-            statement.SuperClass?.Accept(this);
+                _currentClassType = ClassType.SubClass;
+                statement.SuperClass.Accept(this);
+                BeginScope();
+                _scopes.Peek().Add("super", true);
+            }
+            
 
             BeginScope();
             // we'll directly add 'this' as a variable scoped locally to the class
@@ -213,6 +235,12 @@ namespace Lang.Interpreter
             }
 
             EndScope();
+
+            if (statement.SuperClass != null)
+            {
+                EndScope();
+            }
+
             _currentClassType = enclosingClassType;
         }
 
@@ -313,6 +341,7 @@ namespace Lang.Interpreter
     enum ClassType
     {
         None,
-        Class
+        Class,
+        SubClass
     }
 }
