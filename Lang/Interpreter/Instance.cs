@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Lang.Interpreter
 {
@@ -33,7 +32,7 @@ namespace Lang.Interpreter
                 return value;
             }
 
-            return _class.GetMethod(name.WrappedSource) ??
+            return _class.GetMethod(name.WrappedSource)?.Bind(this) ??
                 throw new RuntimeException(name, $"Property '{name.WrappedSource}' is undefined.");
         }
 

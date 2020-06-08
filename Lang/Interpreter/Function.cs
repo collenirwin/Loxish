@@ -67,6 +67,19 @@ namespace Lang.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Binds this function to an instance of a class,
+        /// allowing it to access the instance's 'this' variable.
+        /// </summary>
+        /// <param name="instance">Instance to bind to.</param>
+        /// <returns>The bound function.</returns>
+        public Function Bind(Instance instance)
+        {
+            var environment = new EnvironmentState(outerEnvironment: _closure);
+            environment.Define("this", instance);
+            return new Function(_declaration, environment, _name);
+        }
+
         public override string ToString()
         {
             return $"<fun {_name?.WrappedSource ?? "<anonymous>"}>";

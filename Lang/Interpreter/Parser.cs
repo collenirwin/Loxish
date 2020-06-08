@@ -601,6 +601,11 @@ namespace Lang.Interpreter
                 return new LiteralExpression(_currentToken.Value);
             }
 
+            if (NextTokenMatches(TokenType.This))
+            {
+                return new ThisExpression(_currentToken);
+            }
+
             if (NextTokenMatches(TokenType.Identifier))
             {
                 return new VariableExpression(_currentToken);

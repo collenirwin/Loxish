@@ -338,6 +338,16 @@ namespace Lang.Interpreter
             throw new RuntimeException(expression.Name, "Only class instances have properties.");
         }
 
+        /// <summary>
+        /// Evaluates a this expression.
+        /// </summary>
+        /// <param name="expression">Expression to evaluate.</param>
+        /// <returns>The result of the expression.</returns>
+        public object VisitThisExpression(ThisExpression expression)
+        {
+            return GetVariableValue(expression.Keyword, expression);
+        }
+
         #endregion
 
         #region Statement visitation
@@ -462,7 +472,7 @@ namespace Lang.Interpreter
             var methods = new Dictionary<string, Function>();
             foreach (var method in statement.Methods)
             {
-                methods.Add(method.Name.WrappedSource, new Function(method.Function, _environment));
+                methods.Add(method.Name.WrappedSource, new Function(method.Function, _environment, method.Name));
             }
 
             var @class = new Class(statement.Name.WrappedSource, methods);

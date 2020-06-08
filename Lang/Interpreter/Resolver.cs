@@ -11,6 +11,7 @@ namespace Lang.Interpreter
         private readonly Interpreter _interpreter;
         private readonly Stack<Dictionary<string, bool>> _scopes = new Stack<Dictionary<string, bool>>();
         private FunctionType _currentFunctionType = FunctionType.None;
+        private ClassType _currentClassType = ClassType.None;
 
         public ErrorState ErrorState { get; }
 
@@ -101,6 +102,20 @@ namespace Lang.Interpreter
             return null;
         }
 
+        public object VisitThisExpression(ThisExpression expression)
+        {
+            if (_currentClassType == ClassType.None)
+            {
+                ErrorState.AddError(expression.Keyword, "Cannot use 'this' outside of a class.");
+            }
+            else
+            {
+                ResolveLocal(expression, expression.Keyword);
+            }
+            
+            return null;
+        }
+
         #endregion
 
         #region Statements
@@ -165,13 +180,23 @@ namespace Lang.Interpreter
 
         public void VisitClassStatement(ClassStatement statement)
         {
+            var enclosingClassType = _currentClassType;
+            _currentClassType = ClassType.Class;
+
             Declare(statement.Name);
             Define(statement.Name);
+
+            BeginScope();
+            // we'll directly add 'this' as a variable scoped locally to the class
+            _scopes.Peek().Add("this", true);
 
             foreach (var method in statement.Methods)
             {
                 ResolveFunction(method.Function, FunctionType.Method);
             }
+
+            EndScope();
+            _currentClassType = enclosingClassType;
         }
 
         #endregion
@@ -188,13 +213,16 @@ namespace Lang.Interpreter
 
         private void ResolveLocal(ExpressionBase expression, Token name)
         {
-            for (int index = _scopes.Count - 1; index > -1; index--)
+            int index = 0;
+            foreach (var scope in _scopes)
             {
-                if (_scopes.ElementAt(index).ContainsKey(name.WrappedSource))
+                if (scope.ContainsKey(name.WrappedSource))
                 {
-                    _interpreter.Resolve(expression, _scopes.Count - index - 1);
+                    _interpreter.Resolve(expression, index);
                     return;
                 }
+
+                index++;
             }
         }
         private void ResolveFunction(FunctionExpression function, FunctionType type)
@@ -229,7 +257,14 @@ namespace Lang.Interpreter
         {
             if (_scopes.Any())
             {
-                _scopes.Peek().Add(name.WrappedSource, false);
+                var scope = _scopes.Peek();
+
+                if (scope.ContainsKey(name.WrappedSource))
+                {
+                    ErrorState.AddError(name, $"Variable '{name.WrappedSource}' already delcared in this scope.");
+                }
+
+                scope[name.WrappedSource] = false;
             }
         }
 
@@ -252,5 +287,14 @@ namespace Lang.Interpreter
         None,
         Function,
         Method
+    }
+
+    /// <summary>
+    /// Defines the available types of classes.
+    /// </summary>
+    enum ClassType
+    {
+        None,
+        Class
     }
 }

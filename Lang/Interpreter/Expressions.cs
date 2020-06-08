@@ -213,4 +213,19 @@ namespace Lang.Interpreter
             return visitor.VisitSetExpression(this);
         }
     }
+
+    public class ThisExpression : ExpressionBase
+    {
+        public Token Keyword { get; }
+
+        public ThisExpression(Token keyword)
+        {
+            Keyword = keyword;
+        }
+
+        public override T Accept<T>(IExpressionVisitor<T> visitor)
+        {
+            return visitor.VisitThisExpression(this);
+        }
+    }
 }
