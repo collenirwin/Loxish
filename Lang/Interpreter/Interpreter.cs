@@ -331,6 +331,20 @@ namespace Lang.Interpreter
             if (@object is Instance instance)
             {
                 var value = Evaluate(expression.Value);
+
+                if (expression.Operator.Type == TokenType.PlusEqual)
+                {
+                    var currentValue = instance.Get(expression.Name);
+                    value = RunOperationAsNumbers(currentValue, value, expression.Operator,
+                        (var, val) => var + val);
+                }
+                else if (expression.Operator.Type == TokenType.MinusEqual)
+                {
+                    var currentValue = instance.Get(expression.Name);
+                    value = RunOperationAsNumbers(currentValue, value, expression.Operator,
+                        (var, val) => var - val);
+                }
+
                 instance.Set(expression.Name, value);
                 return value;
             }

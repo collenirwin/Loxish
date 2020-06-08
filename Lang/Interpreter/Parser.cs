@@ -410,7 +410,7 @@ namespace Lang.Interpreter
 
                 if (expression is GetExpression getExpression)
                 {
-                    return new SetExpression(getExpression.Object, getExpression.Name, value);
+                    return new SetExpression(getExpression.Object, getExpression.Name, @operator, value);
                 }
 
                 Error(@operator, "Invalid assignment target.");

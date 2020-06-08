@@ -199,12 +199,14 @@ namespace Lang.Interpreter
     {
         public ExpressionBase Object { get; }
         public Token Name { get; }
+        public Token Operator { get; }
         public ExpressionBase Value { get; }
 
-        public SetExpression(ExpressionBase @object, Token name, ExpressionBase value)
+        public SetExpression(ExpressionBase @object, Token name, Token @operator, ExpressionBase value)
         {
             Object = @object;
             Name = name;
+            Operator = @operator;
             Value = value;
         }
 
