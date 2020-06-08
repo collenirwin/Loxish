@@ -481,6 +481,13 @@ namespace Lang.Interpreter
         /// <param name="statement">Statement to run.</param>
         public void VisitClassStatement(ClassStatement statement)
         {
+            Class superClass = null;
+            if (statement.SuperClass != null)
+            {
+                superClass = Evaluate(statement.SuperClass) as Class ??
+                    throw new RuntimeException(statement.SuperClass.Name, "Superclass must be a class.");
+            }
+            
             _environment.Define(statement.Name.WrappedSource, null);
 
             var methods = new Dictionary<string, Function>();
@@ -491,7 +498,7 @@ namespace Lang.Interpreter
                         isInit: method.Name.WrappedSource == "init"));
             }
 
-            var @class = new Class(statement.Name.WrappedSource, methods);
+            var @class = new Class(statement.Name.WrappedSource, methods, superClass);
             _environment.Assign(statement.Name, @class);
         }
 

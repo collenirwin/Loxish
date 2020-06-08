@@ -15,6 +15,11 @@ namespace Lang.Interpreter
         public string Name { get; }
 
         /// <summary>
+        /// The (optional) superclass of this class.
+        /// </summary>
+        public Class SuperClass { get; }
+
+        /// <summary>
         /// The number of arguments the constructor requires.
         /// </summary>
         public int ParamCount => TryGetMethod("init")?.ParamCount ?? 0;
@@ -23,10 +28,11 @@ namespace Lang.Interpreter
         /// Initializes a <see cref="Class"/> with a name.
         /// </summary>
         /// <param name="name">The name of the class.</param>
-        public Class(string name, Dictionary<string, Function> methods)
+        public Class(string name, Dictionary<string, Function> methods, Class superClass = null)
         {
             Name = name;
             _methods = methods;
+            SuperClass = superClass;
         }
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace Lang.Interpreter
         public Function TryGetMethod(string name)
         {
             _methods.TryGetValue(name, out Function function);
-            return function;
+            return function ?? SuperClass?.TryGetMethod(name);
         }
 
         public override string ToString()

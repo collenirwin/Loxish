@@ -16,6 +16,7 @@
         PlusEqual,
         Minus,
         MinusEqual,
+        Colon,
         SemiColon,
         Slash,
         Star,

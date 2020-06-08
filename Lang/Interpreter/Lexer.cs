@@ -111,6 +111,9 @@ namespace Lang.Interpreter
                 case '^':
                     AddToken(TokenType.Caret);
                     break;
+                case ':':
+                    AddToken(TokenType.Colon);
+                    break;
 
                 // single or double-char tokens
                 case '!':

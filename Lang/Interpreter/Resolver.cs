@@ -194,6 +194,13 @@ namespace Lang.Interpreter
             Declare(statement.Name);
             Define(statement.Name);
 
+            if (statement.Name.WrappedSource == statement.SuperClass?.Name.WrappedSource)
+            {
+                ErrorState.AddError(statement.SuperClass.Name, "A class cannot derive from itself.");
+            }
+
+            statement.SuperClass?.Accept(this);
+
             BeginScope();
             // we'll directly add 'this' as a variable scoped locally to the class
             _scopes.Peek().Add("this", true);

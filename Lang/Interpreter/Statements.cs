@@ -153,11 +153,14 @@ namespace Lang.Interpreter
     public class ClassStatement : StatementBase
     {
         public Token Name { get; }
+        public VariableExpression SuperClass { get; }
         public IEnumerable<FunctionStatement> Methods { get; }
 
-        public ClassStatement(Token name, IEnumerable<FunctionStatement> methods)
+        public ClassStatement(Token name, VariableExpression superClass,
+            IEnumerable<FunctionStatement> methods)
         {
             Name = name;
+            SuperClass = superClass;
             Methods = methods;
         }
 

@@ -140,6 +140,14 @@ namespace Lang.Interpreter
         private ClassStatement ClassDeclaration()
         {
             var name = Consume(TokenType.Identifier, "Expected class name.");
+
+            VariableExpression superClass = null;
+            if (NextTokenMatches(TokenType.Colon))
+            {
+                var token = Consume(TokenType.Identifier, "Expected superclass name after ':'.");
+                superClass = new VariableExpression(token);
+            }
+
             Consume(TokenType.LeftCurlyBrace, "Expected '{' before class body.");
 
             var methods = new List<FunctionStatement>();
@@ -149,7 +157,7 @@ namespace Lang.Interpreter
             }
 
             Consume(TokenType.RightCurlyBrace, "Expected '}' after class body.");
-            return new ClassStatement(name, methods);
+            return new ClassStatement(name, superClass, methods);
         }
 
         /// <summary>
