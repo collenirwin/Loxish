@@ -4,16 +4,16 @@ using System.Collections.Generic;
 namespace Lang.Interpreter.NativeFunctions
 {
     /// <summary>
-    /// Native function that gets the current date and time as fractional seconds.
+    /// Native function that returns a line of standard input from the user.
     /// </summary>
-    public class SysClockSeconds : NativeFunctionBase
+    public class ReadLine : NativeFunctionBase
     {
-        public override string Name { get; } = "__SysClockSeconds";
+        public override string Name { get; } = "readline";
         public override int ParamCount { get; } = 0;
 
         public override object Call(Interpreter interpreter, IEnumerable<object> arguments)
         {
-            return TimeSpan.FromTicks(DateTime.Now.Ticks).TotalSeconds;
+            return Console.ReadLine();
         }
     }
 }
