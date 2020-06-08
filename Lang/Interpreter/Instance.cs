@@ -53,9 +53,6 @@ namespace Lang.Interpreter
             }
         }
 
-        public override string ToString()
-        {
-            return $"{_class.Name} instance";
-        }
+        public override string ToString() => $"{_class.Name} instance";
     }
 }

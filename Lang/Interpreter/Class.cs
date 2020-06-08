@@ -61,9 +61,6 @@ namespace Lang.Interpreter
             return function ?? SuperClass?.TryGetMethod(name);
         }
 
-        public override string ToString()
-        {
-            return Name;
-        }
+        public override string ToString() => Name;
     }
 }

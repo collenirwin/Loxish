@@ -88,9 +88,6 @@ namespace Lang.Interpreter
             return new Function(_declaration, environment, _name, _isInit);
         }
 
-        public override string ToString()
-        {
-            return $"<fun {_name?.WrappedSource ?? "<anonymous>"}>";
-        }
+        public override string ToString() => $"<fun {_name?.WrappedSource ?? "<anonymous>"}>";
     }
 }
