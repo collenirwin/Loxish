@@ -32,7 +32,7 @@ namespace Lang.Interpreter
                 return value;
             }
 
-            return _class.GetMethod(name.WrappedSource)?.Bind(this) ??
+            return _class.TryGetMethod(name.WrappedSource)?.Bind(this) ??
                 throw new RuntimeException(name, $"Property '{name.WrappedSource}' is undefined.");
         }
 

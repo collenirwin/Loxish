@@ -11,6 +11,7 @@ namespace Lang.Interpreter
         private readonly Token _name;
         private readonly FunctionExpression _declaration;
         private readonly EnvironmentState _closure;
+        private readonly bool _isInit;
 
         /// <summary>
         /// The number of arguments this function requires.
@@ -22,11 +23,13 @@ namespace Lang.Interpreter
         /// <see cref="FunctionStatement"/> declaration it originated from.
         /// </summary>
         /// <param name="declaration">Parsed source of the function.</param>
-        public Function(FunctionExpression declaration, EnvironmentState closure, Token name = null)
+        public Function(FunctionExpression declaration, EnvironmentState closure,
+            Token name = null, bool isInit = false)
         {
             _declaration = declaration;
             _closure = closure;
             _name = name;
+            _isInit = isInit;
             ParamCount = _declaration.Params.Count();
         }
 
@@ -61,10 +64,15 @@ namespace Lang.Interpreter
             }
             catch (ReturnException ex)
             {
-                return ex.Value;
+                return _isInit
+                    ? _closure.GetValue("this", 0)
+                    : ex.Value;
             }
             
-            return null;
+            // constructors will always return 'this'
+            return _isInit
+                ? _closure.GetValue("this", 0)
+                : null;
         }
 
         /// <summary>
@@ -77,7 +85,7 @@ namespace Lang.Interpreter
         {
             var environment = new EnvironmentState(outerEnvironment: _closure);
             environment.Define("this", instance);
-            return new Function(_declaration, environment, _name);
+            return new Function(_declaration, environment, _name, _isInit);
         }
 
         public override string ToString()

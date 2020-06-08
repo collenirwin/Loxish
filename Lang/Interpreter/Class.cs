@@ -17,7 +17,7 @@ namespace Lang.Interpreter
         /// <summary>
         /// The number of arguments the constructor requires.
         /// </summary>
-        public int ParamCount { get; }
+        public int ParamCount => TryGetMethod("init")?.ParamCount ?? 0;
 
         /// <summary>
         /// Initializes a <see cref="Class"/> with a name.
@@ -37,7 +37,11 @@ namespace Lang.Interpreter
         /// <returns></returns>
         public object Call(Interpreter interpreter, IEnumerable<object> arguments)
         {
-            return new Instance(this);
+            var instance = new Instance(this);
+
+            // run constructor if it exists
+            TryGetMethod("init")?.Bind(instance).Call(interpreter, arguments);
+            return instance;
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace Lang.Interpreter
         /// </summary>
         /// <param name="name">Name of the method.</param>
         /// <returns>The method <see cref="Function"/> object, or null if not found.</returns>
-        public Function GetMethod(string name)
+        public Function TryGetMethod(string name)
         {
             _methods.TryGetValue(name, out Function function);
             return function;

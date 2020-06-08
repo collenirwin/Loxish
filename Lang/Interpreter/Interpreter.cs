@@ -486,7 +486,9 @@ namespace Lang.Interpreter
             var methods = new Dictionary<string, Function>();
             foreach (var method in statement.Methods)
             {
-                methods.Add(method.Name.WrappedSource, new Function(method.Function, _environment, method.Name));
+                methods.Add(method.Name.WrappedSource,
+                    new Function(method.Function, _environment, method.Name,
+                        isInit: method.Name.WrappedSource == "init"));
             }
 
             var @class = new Class(statement.Name.WrappedSource, methods);
@@ -633,7 +635,7 @@ namespace Lang.Interpreter
         {
             if (_locals.TryGetValue(expression, out int distance))
             {
-                return _environment.GetValue(name, distance);
+                return _environment.GetValue(name.WrappedSource, distance);
             }
 
             return GlobalState.GetValue(name);

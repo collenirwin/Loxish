@@ -323,7 +323,7 @@ namespace Lang.Interpreter
             var keyword = _currentToken;
             ExpressionBase value = null;
 
-            if (!NextTokenMatches(TokenType.SemiColon))
+            if (!PeekMatches(TokenType.SemiColon))
             {
                 value = Expression();
             }

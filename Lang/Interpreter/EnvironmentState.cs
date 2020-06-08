@@ -99,15 +99,15 @@ namespace Lang.Interpreter
         }
 
         /// <summary>
-        /// Gets the value the corresponds with the name token at the given distance.
+        /// Gets the value the corresponds with the variable name at the given distance.
         /// </summary>
-        /// <param name="name">The variable name token.</param>
+        /// <param name="name">The variable name.</param>
         /// <param name="distance">Scope depth difference.</param>
         /// <exception cref="RuntimeException"/>
         /// <returns>The value the corresponds with the name token.</returns>
-        public object GetValue(Token name, int distance)
+        public object GetValue(string name, int distance)
         {
-            return GetAncestor(distance)._values[name.WrappedSource];
+            return GetAncestor(distance)._values[name];
         }
 
         /// <summary>

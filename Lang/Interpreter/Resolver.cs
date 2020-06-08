@@ -175,7 +175,15 @@ namespace Lang.Interpreter
                 ErrorState.AddError(statement.Keyword, "Cannot return from top-level code.");
             }
 
-            statement.Value?.Accept(this);
+            if (statement.Value != null)
+            {
+                if (_currentFunctionType == FunctionType.Init)
+                {
+                    ErrorState.AddError(statement.Keyword, "Cannot return a value from an initializer.");
+                }
+
+                statement.Value.Accept(this);
+            }
         }
 
         public void VisitClassStatement(ClassStatement statement)
@@ -192,7 +200,9 @@ namespace Lang.Interpreter
 
             foreach (var method in statement.Methods)
             {
-                ResolveFunction(method.Function, FunctionType.Method);
+                ResolveFunction(method.Function, method.Name.WrappedSource == "init"
+                    ? FunctionType.Init
+                    : FunctionType.Method);
             }
 
             EndScope();
@@ -286,7 +296,8 @@ namespace Lang.Interpreter
     {
         None,
         Function,
-        Method
+        Method,
+        Init
     }
 
     /// <summary>
